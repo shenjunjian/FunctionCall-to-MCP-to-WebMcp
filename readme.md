@@ -9,3 +9,6 @@ apikey: sk-b462f8de7b364629b3136312c106655a
 modelId: deepseek-chat
 
  和 deepseek-reasoner
+
+
+ 根据ask.md, 实现任务
