@@ -30,8 +30,11 @@
 
 ## 相较 Function Calling 的优势
 - 服务端与客户端分离： 可以是不同的语言实现，例如Python、JavaScript等。
-- 服务端独立部署
-- 便于分享
+
+核心区别一目了然：在MCP范式下，工具的描述和实现从应用代码库中剥离，转移到了独立的、可插拔的服务器中。应用（Client）变得轻量且通用，它只需懂得MCP这一种“语言”，就能与任何说这种语言的工具（Server）对话。
+因此，MCP与Function Calling并非简单的替代关系，而是互补与扩展。Function Calling是模型理解工具调用意图的“大脑接口”，而MCP是工具被标准化封装、被发现和调用的“网络协议”。在实际架构中，MCP Client从Server获取工具列表，再将其转换为模型（如GPT-4）能识别的Function Calling格式传入；模型决定调用后，再由Client将请求转换回MCP协议发送给Server执行。MCP解决的是工具生态的标准化互联问题，而非改变模型本身的调用机制。
+
+- 服务端独立部署 便于开源共享，插件市场
 
 MCP市场：
 [MCP Server](https://mcpservers.org/)
@@ -60,8 +63,7 @@ https://vscode.js.cn/docs/copilot/reference/mcp-configuration
 ```
 
 
-核心区别一目了然：在MCP范式下，工具的描述和实现从应用代码库中剥离，转移到了独立的、可插拔的服务器中。应用（Client）变得轻量且通用，它只需懂得MCP这一种“语言”，就能与任何说这种语言的工具（Server）对话。
-因此，MCP与Function Calling并非简单的替代关系，而是互补与扩展。Function Calling是模型理解工具调用意图的“大脑接口”，而MCP是工具被标准化封装、被发现和调用的“网络协议”。在实际架构中，MCP Client从Server获取工具列表，再将其转换为模型（如GPT-4）能识别的Function Calling格式传入；模型决定调用后，再由Client将请求转换回MCP协议发送给Server执行。MCP解决的是工具生态的标准化互联问题，而非改变模型本身的调用机制。
+
 
 
 
