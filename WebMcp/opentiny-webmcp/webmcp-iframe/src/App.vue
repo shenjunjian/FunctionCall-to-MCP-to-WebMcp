@@ -2,14 +2,11 @@
 import { onMounted, ref } from "vue";
 import HelloWorld from "./components/HelloWorld.vue";
 
-import {
-  setupWebMcpServer,
-  setupWebMcpClient,
-} from "../../webmcp-iframe/src/webmcp";
+import { setupWebMcpServer, setupWebMcpClient } from "./webmcp";
 
 // 1.  初始化WebMCP服务器和客户端
-const webMcpServer = setupWebMcpServer();
-const webMcpClient = setupWebMcpClient();
+const webMcpServer = await setupWebMcpServer();
+const webMcpClient = await setupWebMcpClient();
 
 type ToolsType = Awaited<ReturnType<typeof webMcpClient.listTools>>["tools"];
 const currentTools = ref<ToolsType>([]);

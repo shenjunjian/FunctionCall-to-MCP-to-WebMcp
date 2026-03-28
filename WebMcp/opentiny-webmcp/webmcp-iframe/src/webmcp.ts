@@ -1,8 +1,5 @@
-import * as next from "@opentiny/next";
 import * as nextSdk from "@opentiny/next-sdk";
 
-console.log(next);
-console.log(nextSdk);
 // createMessageChannelPairTransport
 // createMessageChannelClientTransport
 // createMessageChannelServerTransport
@@ -14,12 +11,14 @@ import {
 } from "@opentiny/next-sdk";
 import { WebMcpServer, WebMcpClient, z } from "@opentiny/next-sdk";
 
-// 1、同一个页面中，创建2个单例对象，分别是webMcpServer和webMcpClient, 共享同一个 PairTransport
-const [serverTransport, clientTransport] = createMessageChannelPairTransport();
+// 2、跨 Iframe 通信时, 注意： 下面2个setup函数是异步函数了。
 
 let webMcpServer: WebMcpServer;
-export function setupWebMcpServer() {
+export async function setupWebMcpServer() {
   if (webMcpServer) return webMcpServer;
+
+  const transport = createMessageChannelServerTransport("endpoint");
+  await transport.listen();
 
   webMcpServer = new WebMcpServer();
   // 注册一些页面级的工具
@@ -35,16 +34,20 @@ export function setupWebMcpServer() {
     },
   );
 
-  webMcpServer.connect(serverTransport);
+  await webMcpServer.connect(transport);
   return webMcpServer;
 }
 
 let webMcpClient: WebMcpClient;
-export function setupWebMcpClient() {
+export async function setupWebMcpClient() {
   if (webMcpClient) return webMcpClient;
 
+  const transport = createMessageChannelClientTransport(
+    "endpoint",
+    window.parent,
+  );
   webMcpClient = new WebMcpClient();
-  webMcpClient.connect(clientTransport);
+  await webMcpClient.connect(transport);
 
   return webMcpClient;
 }
