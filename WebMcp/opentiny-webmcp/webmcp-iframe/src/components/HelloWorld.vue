@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import viteLogo from "../assets/vite.svg";
 import heroImg from "../assets/hero.png";
 import vueLogo from "../assets/vue.svg";
@@ -8,36 +8,36 @@ import { z } from "@opentiny/next-sdk";
 
 const count = ref(0);
 
-const webMcpServer = await setupWebMcpServer();
-
-webMcpServer.registerTool(
-  "get-count",
-  {
-    title: "获取当前计数器值",
-    description: "获取当前计数器值",
-    inputSchema: z.object({}) as any,
-  },
-  async () => {
-    return {
-      content: [{ type: "text", text: "当前计数器值为：" + count.value }],
-    };
-  },
-);
-
-webMcpServer.registerTool(
-  "add-count",
-  {
-    title: "计数器增加10",
-    description: "计数器增加10",
-    inputSchema: z.object({}) as any,
-  },
-  async () => {
-    count.value += 10;
-    return {
-      content: [{ type: "text", text: "当前计数器值为：" + count.value }],
-    };
-  },
-);
+onMounted(async () => {
+  const webMcpServer = await setupWebMcpServer();
+  webMcpServer.registerTool(
+    "get-count",
+    {
+      title: "获取当前计数器值",
+      description: "获取当前计数器值",
+      inputSchema: z.object({}) as any,
+    },
+    async () => {
+      return {
+        content: [{ type: "text", text: "当前计数器值为：" + count.value }],
+      };
+    },
+  );
+  webMcpServer.registerTool(
+    "add-count",
+    {
+      title: "计数器增加10",
+      description: "计数器增加10",
+      inputSchema: z.object({}) as any,
+    },
+    async () => {
+      count.value += 10;
+      return {
+        content: [{ type: "text", text: "当前计数器值为：" + count.value }],
+      };
+    },
+  );
+});
 </script>
 
 <template>

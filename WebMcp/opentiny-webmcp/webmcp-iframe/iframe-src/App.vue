@@ -2,12 +2,10 @@
 import { onMounted, ref } from "vue";
 
 import { setupWebMcpServer, setupWebMcpClient } from "./webmcp";
-
-// 1.  初始化客户端
-const webMcpClient = await setupWebMcpClient();
-
-type ToolsType = Awaited<ReturnType<typeof webMcpClient.listTools>>["tools"];
 const currentTools = ref<ToolsType>([]);
+
+let webMcpClient: WebmcpClient;
+type ToolsType = Awaited<ReturnType<typeof webMcpClient.listTools>>["tools"];
 
 // 2.  刷新工具列表，做展示层UI
 function refreshTool() {
@@ -24,14 +22,16 @@ function callTool(tool: ToolsType[0]) {
   });
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 1.  初始化客户端
+  webMcpClient = await setupWebMcpClient();
   refreshTool();
 });
 </script>
 
 <template>
   <div class="tool-container">
-    <h3 @click="refreshTool">当前工具</h3>
+    <h3 @click="refreshTool">iframe:当前工具</h3>
     <ul>
       <li v-for="tool in currentTools" :key="tool.name" @click="callTool(tool)">
         {{ tool.name }} - {{ tool.description }}
@@ -41,23 +41,6 @@ onMounted(() => {
 </template>
 
 <style lang="css" scoped>
-.tool-container {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 20px;
-  min-width: 200px;
-  z-index: 100;
-  /* 添加卡片悬浮效果 */
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  margin: 20px;
-}
 h3,
 li {
   cursor: pointer;

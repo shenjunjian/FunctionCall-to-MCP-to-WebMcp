@@ -1,18 +1,10 @@
-import * as nextSdk from "@opentiny/next-sdk";
-
-// createMessageChannelPairTransport
-// createMessageChannelClientTransport
-// createMessageChannelServerTransport
-
 import {
-  createMessageChannelPairTransport,
   createMessageChannelServerTransport,
   createMessageChannelClientTransport,
 } from "@opentiny/next-sdk";
 import { WebMcpServer, WebMcpClient, z } from "@opentiny/next-sdk";
 
 // 2、跨 Iframe 通信时, 注意： 下面2个setup函数是异步函数了。
-
 let webMcpServer: WebMcpServer;
 export async function setupWebMcpServer() {
   if (webMcpServer) return webMcpServer;
