@@ -8,7 +8,7 @@ import { z } from "@opentiny/next-sdk";
 
 const count = ref(0);
 
-const webMcpServer = setupWebMcpServer();
+const webMcpServer = await setupWebMcpServer();
 
 webMcpServer.registerTool(
   "get-count",
