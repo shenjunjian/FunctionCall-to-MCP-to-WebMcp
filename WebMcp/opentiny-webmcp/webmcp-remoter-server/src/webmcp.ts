@@ -42,3 +42,12 @@ export async function setupWebMcpClient() {
 
   return webMcpClient;
 }
+
+// export interface ClientConnectOptions {
+//   url: string
+//   token?: string
+//   sessionId?: string
+//   type?: 'channel' | 'sse' | 'stream' | 'socket'
+//   agent?: boolean
+//   onError?: (error: Error) => void
+// }
