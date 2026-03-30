@@ -10,6 +10,10 @@ import { setupWebMcpServer, setupWebMcpClient } from "./webmcp";
 onMounted(async () => {
   const webMcpServer = await setupWebMcpServer();
   const webMcpClient = await setupWebMcpClient();
+
+  setTimeout(async () => {
+    console.log(await webMcpClient.listTools());
+  }, 3000);
 });
 </script>
 

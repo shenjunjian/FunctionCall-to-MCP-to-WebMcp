@@ -37,7 +37,7 @@ export async function setupWebMcpClient() {
   await webMcpClient.connect({
     agent: true,
     url: "https://agent.opentiny.design/api/v1/webmcp-trial/mcp",
-    sessionId: "123456",
+    sessionId: "sk-123456",
   });
 
   return webMcpClient;

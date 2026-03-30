@@ -2,9 +2,10 @@
 import { onMounted, ref } from "vue";
 
 import { setupWebMcpServer, setupWebMcpClient } from "./webmcp";
+import { WebMcpClient } from "@opentiny/next-sdk";
 const currentTools = ref<ToolsType>([]);
 
-let webMcpClient: WebmcpClient;
+let webMcpClient: WebMcpClient;
 type ToolsType = Awaited<ReturnType<typeof webMcpClient.listTools>>["tools"];
 
 // 2.  刷新工具列表，做展示层UI
