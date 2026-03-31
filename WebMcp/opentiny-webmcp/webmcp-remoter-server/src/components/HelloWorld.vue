@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import viteLogo from "../assets/vite.svg";
 import heroImg from "../assets/hero.png";
 import vueLogo from "../assets/vue.svg";
-import { setupWebMcpServer } from "../../../webmcp-iframe/src/webmcp";
+import { setupWebMcpServer } from "../webmcp";
 import { z } from "@opentiny/next-sdk";
 
 const count = ref(0);
