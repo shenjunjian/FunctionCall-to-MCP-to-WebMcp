@@ -1,5 +1,5 @@
 {
-  "name": "webmcp-remoter",
+  "name": "webmcp-remoter-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
