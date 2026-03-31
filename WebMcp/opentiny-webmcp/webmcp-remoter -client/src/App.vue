@@ -33,7 +33,7 @@ onMounted(async () => {
 
 <template>
   <div class="tool-container">
-    <h3 @click="refreshTool">iframe:当前工具</h3>
+    <h3 @click="refreshTool">RemoterClient: 远端当前工具</h3>
     <ul>
       <li v-for="tool in currentTools" :key="tool.name" @click="callTool(tool)">
         {{ tool.name }} - {{ tool.description }}
