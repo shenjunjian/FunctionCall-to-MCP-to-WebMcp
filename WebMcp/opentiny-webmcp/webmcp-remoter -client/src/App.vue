@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { WebMcpClient } from "@opentiny/next-sdk";
-import { setupWebMcpClient } from "./webmcp";
+import { setupWebMcpClient, setupMcpClient } from "./webmcp";
+import { Client } from "@modelcontextprotocol/sdk/client/index";
 const currentTools = ref<ToolsType>([]);
 
-let webMcpClient: WebMcpClient;
+let webMcpClient: WebMcpClient | Client;
 type ToolsType = Awaited<ReturnType<typeof webMcpClient.listTools>>["tools"];
 
 // 2.  刷新工具列表，做展示层UI
@@ -24,7 +25,8 @@ function callTool(tool: ToolsType[0]) {
 
 onMounted(async () => {
   // 1.  初始化客户端
-  webMcpClient = await setupWebMcpClient();
+  // webMcpClient = await setupWebMcpClient();
+  webMcpClient = await setupMcpClient();
   refreshTool();
 });
 </script>
