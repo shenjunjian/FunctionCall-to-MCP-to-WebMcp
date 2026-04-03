@@ -7,6 +7,8 @@
 - 应用场景的标准的mcpServer
 - Agent层的多代理 ，每个子代理是一个server
 - 扩展内的能力也是server, 例如： 标签，无障碍，消息通信等。
+- webSkills 也是server
+- webSearch 待增加 联网查询能力。
 
 所以它的配置必须规范化：
 

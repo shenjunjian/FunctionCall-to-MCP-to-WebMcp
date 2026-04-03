@@ -49,3 +49,10 @@ function registerOnWebAgent(option: RegisterOnWebAgentOption) {
   };
 }
 ```
+
+3. 文档讲2块内容，
+
+工具如何管理：通用级，页面级
+
+jsonSchema如何定义：
+标准是什么， zod@3 zod@4。 如何中断询问，如何继续询问。 如何返回结构化数据
