@@ -9,6 +9,7 @@
 - 扩展内的能力也是server, 例如： 标签，无障碍，消息通信等。
 - webSkills 也是server
 - webSearch 待增加 联网查询能力。
+- 图片识别能力
 
 所以它的配置必须规范化：
 
@@ -16,5 +17,23 @@
 {
     type: 'httpstream'|'page'|'memory',
     url?:string
+    window?: Window,
+    tools:[
+        {
+            name: string,
+            description: string,
+            inputSchema: any,
+             execute: (args: any) => Promise<any>,
+        }
+    ]
+
+}
+```
+
+```ts
+{
+    type: 'image',
+    url: string,
+    type?: string,
 }
 ```

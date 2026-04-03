@@ -56,5 +56,69 @@ function registerOnWebAgent(option: RegisterOnWebAgentOption) {
 
 2. inputSchema如何定义：
    `jsonSchema`的标准是什么， 如何使用 zod@3 zod@4 valibot, TypeBox等辅助生成。
-   如何中断询问，如何继续询问。
-   如何返回结构化数据
+   如何agent中断询问，如何继续询问。
+   如何返回结构化数据，正确值，错误值
+
+   ```ts 正确值
+   execute: ({ text }, agent) => {
+    // Add todo item and update UI
+    addTodoItem(text);
+
+    return {
+        content: [
+            {
+                type: "text",
+                text: `Todo item "${text}" added successfully.`
+            }
+        ]
+    };
+   ```
+
+   ```ts 异步询问
+   execute: async ({ product_id }, agent) => {
+     // Request user confirmation before executing the action
+     const confirmed = await agent.requestUserInteraction(async () => {
+       return new Promise((resolve) => {
+         const confirmed = confirm(
+           `Buy product ${product_id}?\nClick OK to confirm, Cancel to abort.`,
+         );
+         resolve(confirmed);
+       });
+     });
+
+     if (!confirmed) {
+       throw new Error("Purchase cancelled by user.");
+     }
+
+     executePurchase(product_id);
+     return `Product ${product_id} purchased.`;
+   };
+   ```
+
+```ts 错误值
+{
+  isError: true,
+  content: [
+    {
+      type: "text",
+      text: "error is ......"
+    }
+  ]
+}
+```
+
+```ts 结构化值
+{
+  content: [
+    {
+      type: "text",
+      text: "............."
+    }
+  ],
+  structuredContent: {
+    product_id: 123,
+    quantity: 2,
+  }
+}
+
+```
