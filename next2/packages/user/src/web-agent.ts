@@ -10,15 +10,21 @@ interface RegisterOnWebAgentOption {
   /** Transport上的错误回调 */
   onError?: (error: Error) => void;
 }
+
+let isRegistered = false;
 /**
  * 将当前网页注册为智能应用，并代理到一个后端 web-agent 服务
  * @param option 注册选项
  * @returns
  */
 export async function registerOnWebAgent(option: RegisterOnWebAgentOption) {
-  registerOnPage({});
+  if (isRegistered) {
+    throw new Error("registerOnWebAgent can only be called once");
+  }
+  isRegistered = true;
 
-  const { server, client } = createMcpServerClientPair();
+  const { server, client } = registerOnPage({});
+
   const { transport, sessionId } = await createStreamProxy({
     client,
     url: option.url,
@@ -28,8 +34,6 @@ export async function registerOnWebAgent(option: RegisterOnWebAgentOption) {
   transport.onerror = async (error: Error) => {
     option.onError?.(error);
   };
-
-  proxyMcpServer(server);
 
   return {
     server,
