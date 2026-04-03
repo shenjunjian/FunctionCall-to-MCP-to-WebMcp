@@ -16,12 +16,12 @@
 ```ts
 import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
 
-interface RegisterOnWPageOption {
+interface RegisterOnPageOption {
   /** TODO: 待分析需要什么参数 */
   onError?: (error: Error) => void;
 }
 
-function registerOnPage(option: RegisterOnWPageOption) {
+function registerOnPage(option: RegisterOnPageOption) {
   initializeWebMCPPolyfill();
 
   // 创建一个内存transport pair, 代理 WebMCP 接口
@@ -50,9 +50,11 @@ function registerOnWebAgent(option: RegisterOnWebAgentOption) {
 }
 ```
 
-3. 文档讲2块内容，
+## 用户文档
 
-工具如何管理：通用级，页面级
+1. 工具如何管理：通用级，页面级，如何根据`状态， 页面切换`进行动态注册。
 
-jsonSchema如何定义：
-标准是什么， zod@3 zod@4。 如何中断询问，如何继续询问。 如何返回结构化数据
+2. inputSchema如何定义：
+   `jsonSchema`的标准是什么， 如何使用 zod@3 zod@4 valibot, TypeBox等辅助生成。
+   如何中断询问，如何继续询问。
+   如何返回结构化数据
