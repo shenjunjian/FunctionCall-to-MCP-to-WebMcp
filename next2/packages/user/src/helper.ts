@@ -6,42 +6,26 @@ import {
 } from "@modelcontextprotocol/sdk/server/mcp";
 
 /** 快速创建一个基于内存连接的MCPServer和MCPClient pair */
-export function createMcpServerClientPair() {
+export async function createMcpServerClientPair() {
   const [clientTransport, serverTransport] =
     InMemoryTransport.createLinkedPair();
 
-  // 标准的 mcpServer
   const server = new McpServer(
-    {
-      name: "web-mcp-server",
-      version: "1.0.0",
-    },
-    {
-      capabilities: {
-        prompts: { listChanged: true },
-        resources: { subscribe: true, listChanged: true },
-        tools: { listChanged: true },
-        completions: {},
-        logging: {},
-      },
-    },
+    { name: "web-mcp-server", version: "1.0.0" },
+    { capabilities: { tools: { listChanged: true } } }, // 必须允许 listChanged
   );
+  await server.connect(serverTransport);
 
-  server.connect(serverTransport);
-
-  // 标准的mcpClient
   const client = new Client(
     { name: "web-mcp-client", version: "1.0.0" },
     {
       capabilities: {
         roots: { listChanged: true },
-        sampling: {},
-        elicitation: {},
       },
     },
   );
 
-  client.connect(clientTransport);
+  await client.connect(clientTransport);
 
   return { server, client };
 }
@@ -61,7 +45,7 @@ function refreshTools(server: McpServer) {
       tool.name,
       {
         description: tool.description,
-        inputSchema: tool.inputSchema as any, // TODO: 反向转换 string 为 zod 对象？？
+        inputSchema: tool.inputSchema as any,
       },
       async (...args) => {
         return client.executeTool(tool.name, ...args);

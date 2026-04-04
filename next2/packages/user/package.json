@@ -34,7 +34,8 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@mcp-b/webmcp-polyfill": "^2.2.0",
     "@mcp-b/webmcp-types": "^2.2.0",
-    "@opentiny/next": "^0.3.2"
+    "@opentiny/next": "^0.3.2",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

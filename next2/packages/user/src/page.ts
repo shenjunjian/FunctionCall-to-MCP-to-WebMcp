@@ -6,7 +6,7 @@ interface RegisterOnPageOption {
   onError?: (error: Error) => void;
 }
 let isRegistered = false;
-export function registerOnPage(option: RegisterOnPageOption) {
+export async function registerOnPage(option: RegisterOnPageOption) {
   if (isRegistered) {
     throw new Error("registerOnPage can only be called once");
   }
@@ -14,8 +14,8 @@ export function registerOnPage(option: RegisterOnPageOption) {
 
   initializeWebMCPPolyfill();
 
-  const { server, client } = createMcpServerClientPair();
-  proxyMcpServer(server);
+  const { server, client } = await createMcpServerClientPair();
+  // proxyMcpServer(server);
 
   return { server, client };
 }

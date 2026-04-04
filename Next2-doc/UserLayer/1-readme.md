@@ -59,6 +59,15 @@ function registerOnWebAgent(option: RegisterOnWebAgentOption) {
    如何agent中断询问，如何继续询问。
    如何返回结构化数据，正确值，错误值
 
+
+  ```ts 注册工具标准接口
+    window.navigator.modelContext.registerTool({
+    name: "tool-name",
+    description: "Natural language description",
+    inputSchema: { /* JSON Schema object */ },
+    execute: (params, agent) => { /* implementation */ }   // 可能是异步的 async (params, agent) => { }
+  ```
+
    ```ts 正确值
    execute: ({ text }, agent) => {
     // Add todo item and update UI
