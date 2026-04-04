@@ -20,7 +20,7 @@ importers:
     devDependencies:
       vite-plus:
         specifier: 'catalog:'
-        version: 0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
+        version: 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
 
   apps/website:
     dependencies:
@@ -39,7 +39,62 @@ importers:
         version: '@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
-        version: 0.1.15(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
+        version: 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
+
+  packages/agent:
+    dependencies:
+      '@ai-sdk/deepseek':
+        specifier: ^2.0.27
+        version: 2.0.27(zod@3.25.76)
+      '@ai-sdk/mcp':
+        specifier: ^1.0.32
+        version: 1.0.32(zod@3.25.76)
+      '@ai-sdk/openai':
+        specifier: ^3.0.50
+        version: 3.0.50(zod@3.25.76)
+      '@ai-sdk/provider':
+        specifier: ^3.0.8
+        version: 3.0.8
+      '@ai-sdk/provider-utils':
+        specifier: ^4.0.22
+        version: 4.0.22(zod@3.25.76)
+      '@mcp-b/webmcp-polyfill':
+        specifier: ^2.2.0
+        version: 2.2.0
+      '@mcp-b/webmcp-types':
+        specifier: ^2.2.0
+        version: 2.2.0
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(@cfworker/json-schema@4.1.1)(zod@3.25.76)
+      '@opentiny/next':
+        specifier: ^0.3.2
+        version: 0.3.2(@cfworker/json-schema@4.1.1)(zod@3.25.76)
+      ai:
+        specifier: ^6.0.146
+        version: 6.0.146(zod@3.25.76)
+      vue:
+        specifier: ^3.5.0
+        version: 3.5.32(typescript@6.0.2)
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^25.5.0
+        version: 25.5.1
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260328.1
+        version: 7.0.0-dev.20260328.1
+      bumpp:
+        specifier: ^11.0.1
+        version: 11.0.1
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+      vite-plus:
+        specifier: ^0.1.14
+        version: 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
 
   packages/remoter:
     dependencies:
@@ -70,7 +125,7 @@ importers:
         version: '@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
-        version: 0.1.15(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
+        version: 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
 
   packages/user:
     dependencies:
@@ -104,9 +159,43 @@ importers:
         version: 6.0.2
       vite-plus:
         specifier: ^0.1.14
-        version: 0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
+        version: 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
 
 packages:
+
+  '@ai-sdk/deepseek@2.0.27':
+    resolution: {integrity: sha512-J5m7tkelfr3QaZIVoM8rA/9XQtTPoGY1AAGEOhkvuy9JxcFrKIbjqLIQBS47fPRiFj6UdRCjAWMGEZgcohMtDg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/gateway@3.0.88':
+    resolution: {integrity: sha512-AFoj7xdWAtCQcy0jJ235ENSakYM8D28qBX+rB+/rX4r8qe/LXgl0e5UivOqxAlIM5E9jnQdYxIPuj3XFtGk/yg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/mcp@1.0.32':
+    resolution: {integrity: sha512-WkZquZ+bPAwG1mH9yrjGVPKLycaxnUQhJkkYAAZTSAuIgENcO4k/V38+rI28AneoE995mpWn40sFiZ96fHTPgw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/openai@3.0.50':
+    resolution: {integrity: sha512-7M7bklrS+gckzPdpQpC3iG5aN5aQPRJdAJQ5jt7sEgYCqDgUuef9x4Nd570+ghIfKTZvV6tSqeeTuD6De/bZig==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider-utils@4.0.22':
+    resolution: {integrity: sha512-B2OTFcRw/Pdka9ZTjpXv6T6qZ6RruRuLokyb8HwW+aoW9ndJ3YasA3/mVswyJw7VMBF8ofXgqvcrCt9KYvFifg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider@3.0.8':
+    resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
+    engines: {node: '>=18'}
 
   '@babel/helper-string-parser@7.27.1':
     resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
@@ -183,6 +272,10 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
+
+  '@opentelemetry/api@1.9.0':
+    resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
+    engines: {node: '>=8.0.0'}
 
   '@opentiny/fluent-editor@3.25.11':
     resolution: {integrity: sha512-YvNnKTSa8na/4WfqsFoz102MIcacvlVgdlVSrC5jvmXC9B3pitR7wqJIfofutS1f+KxaiBDUsrSHMDdb7wAKsQ==}
@@ -1356,6 +1449,10 @@ packages:
     resolution: {integrity: sha512-e2f1LaETJ1wFIZSZAJwsAumWixGaRslUjESf0nSrZGUensq3ZwXddoDJPPoDLkSAr/Fa3v5aff+dJ39UbNfbNQ==}
     hasBin: true
 
+  '@vercel/oidc@3.1.0':
+    resolution: {integrity: sha512-Fw28YZpRnA3cAHHDlkt7xQHiJ0fcL+NRcIqsocZQUSmbzeIKRpwttJjik5ZGanXP+vlA4SbTg+AbA3bP363l+w==}
+    engines: {node: '>= 20'}
+
   '@vitejs/plugin-vue@6.0.5':
     resolution: {integrity: sha512-bL3AxKuQySfk1iGcBsQnoRVexTPJq0Z/ixFVM8OhVJAP6ZXXXLtM7NFKWhLl30Kg7uTBqIaPXbh+nuQCuBDedg==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1556,6 +1653,12 @@ packages:
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
     engines: {node: '>= 0.6'}
+
+  ai@6.0.146:
+    resolution: {integrity: sha512-70DE8k1rR0N3mXxyyfjYAx/FxRln/kQ5ym18lt1ys1eUklcPuoIXGbUBwdfCbmkt6YF3jCDZ5+OgkWieP/NGDw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
@@ -1900,6 +2003,9 @@ packages:
 
   json-schema-typed@8.0.2:
     resolution: {integrity: sha512-fQhoXdcvc3V28x7C7BMs4P5+kNlgUURe2jmUT1T//oBRMDrqy1QPelJimwZGo7Hg9VPV3EQV5Bnq4hbFy2vetA==}
+
+  json-schema@0.4.0:
+    resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
 
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
@@ -2530,6 +2636,43 @@ packages:
 
 snapshots:
 
+  '@ai-sdk/deepseek@2.0.27(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.22(zod@3.25.76)
+      zod: 3.25.76
+
+  '@ai-sdk/gateway@3.0.88(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.22(zod@3.25.76)
+      '@vercel/oidc': 3.1.0
+      zod: 3.25.76
+
+  '@ai-sdk/mcp@1.0.32(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.22(zod@3.25.76)
+      pkce-challenge: 5.0.1
+      zod: 3.25.76
+
+  '@ai-sdk/openai@3.0.50(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.22(zod@3.25.76)
+      zod: 3.25.76
+
+  '@ai-sdk/provider-utils@4.0.22(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.0.6
+      zod: 3.25.76
+
+  '@ai-sdk/provider@3.0.8':
+    dependencies:
+      json-schema: 0.4.0
+
   '@babel/helper-string-parser@7.27.1': {}
 
   '@babel/helper-validator-identifier@7.28.5': {}
@@ -2622,6 +2765,8 @@ snapshots:
       '@emnapi/runtime': 1.9.2
       '@tybys/wasm-util': 0.10.1
     optional: true
+
+  '@opentelemetry/api@1.9.0': {}
 
   '@opentiny/fluent-editor@3.25.11':
     dependencies:
@@ -4984,6 +5129,8 @@ snapshots:
       '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260328.1
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260328.1
 
+  '@vercel/oidc@3.1.0': {}
+
   '@vitejs/plugin-vue@6.0.5(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(vue@3.5.32(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-rc.2
@@ -5034,7 +5181,7 @@ snapshots:
   '@voidzero-dev/vite-plus-linux-x64-musl@0.1.15':
     optional: true
 
-  '@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)':
+  '@voidzero-dev/vite-plus-test@0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.3
@@ -5051,6 +5198,7 @@ snapshots:
       vite: '@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       ws: 8.20.0
     optionalDependencies:
+      '@opentelemetry/api': 1.9.0
       '@types/node': 25.5.1
     transitivePeerDependencies:
       - '@arethetypeswrong/core'
@@ -5073,7 +5221,7 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  '@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)':
+  '@voidzero-dev/vite-plus-test@0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.3
@@ -5090,6 +5238,7 @@ snapshots:
       vite: 8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3)
       ws: 8.20.0
     optionalDependencies:
+      '@opentelemetry/api': 1.9.0
       '@types/node': 25.5.1
     transitivePeerDependencies:
       - '@arethetypeswrong/core'
@@ -5170,6 +5319,12 @@ snapshots:
       '@vue/shared': 3.5.32
       vue: 3.5.32(typescript@5.9.3)
 
+  '@vue/server-renderer@3.5.32(vue@3.5.32(typescript@6.0.2))':
+    dependencies:
+      '@vue/compiler-ssr': 3.5.32
+      '@vue/shared': 3.5.32
+      vue: 3.5.32(typescript@6.0.2)
+
   '@vue/shared@3.5.32': {}
 
   '@vue/tsconfig@0.9.1(typescript@5.9.3)(vue@3.5.32(typescript@5.9.3))':
@@ -5194,6 +5349,14 @@ snapshots:
     dependencies:
       mime-types: 3.0.2
       negotiator: 1.0.0
+
+  ai@6.0.146(zod@3.25.76):
+    dependencies:
+      '@ai-sdk/gateway': 3.0.88(zod@3.25.76)
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.22(zod@3.25.76)
+      '@opentelemetry/api': 1.9.0
+      zod: 3.25.76
 
   ajv-formats@3.0.1(ajv@8.18.0):
     optionalDependencies:
@@ -5518,6 +5681,8 @@ snapshots:
   json-schema-traverse@1.0.0: {}
 
   json-schema-typed@8.0.2: {}
+
+  json-schema@0.4.0: {}
 
   jsonc-parser@3.3.1: {}
 
@@ -6077,11 +6242,11 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-plus@0.1.15(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3):
+  vite-plus@0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3):
     dependencies:
       '@oxc-project/types': 0.122.0
       '@voidzero-dev/vite-plus-core': 0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
-      '@voidzero-dev/vite-plus-test': 0.1.15(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
+      '@voidzero-dev/vite-plus-test': 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)
       cac: 7.0.0
       cross-spawn: 7.0.6
       jsonc-parser: 3.3.1
@@ -6126,11 +6291,11 @@ snapshots:
       - vite
       - yaml
 
-  vite-plus@0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3):
+  vite-plus@0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3):
     dependencies:
       '@oxc-project/types': 0.122.0
       '@voidzero-dev/vite-plus-core': 0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(yaml@2.8.3)
-      '@voidzero-dev/vite-plus-test': 0.1.15(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
+      '@voidzero-dev/vite-plus-test': 0.1.15(@opentelemetry/api@1.9.0)(@types/node@25.5.1)(jiti@2.6.1)(typescript@6.0.2)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.1)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
       cac: 7.0.0
       cross-spawn: 7.0.6
       jsonc-parser: 3.3.1
@@ -6200,6 +6365,16 @@ snapshots:
       '@vue/shared': 3.5.32
     optionalDependencies:
       typescript: 5.9.3
+
+  vue@3.5.32(typescript@6.0.2):
+    dependencies:
+      '@vue/compiler-dom': 3.5.32
+      '@vue/compiler-sfc': 3.5.32
+      '@vue/runtime-dom': 3.5.32
+      '@vue/server-renderer': 3.5.32(vue@3.5.32(typescript@6.0.2))
+      '@vue/shared': 3.5.32
+    optionalDependencies:
+      typescript: 6.0.2
 
   w3c-keyname@2.2.8: {}
 
