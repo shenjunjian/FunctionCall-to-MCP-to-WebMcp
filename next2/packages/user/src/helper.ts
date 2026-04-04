@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory";
+import { createTransportPair } from "@opentiny/next";
 import {
   McpServer,
   type RegisteredTool,
@@ -7,6 +8,7 @@ import {
 
 /** 快速创建一个基于内存连接的MCPServer和MCPClient pair */
 export async function createMcpServerClientPair() {
+  // createTransportPair();  备用方案，
   const [clientTransport, serverTransport] =
     InMemoryTransport.createLinkedPair();
 
