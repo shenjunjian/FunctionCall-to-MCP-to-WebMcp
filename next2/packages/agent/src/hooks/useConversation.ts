@@ -1,11 +1,11 @@
-import type { UserModelMessage } from "ai";
+import type { ModelMessage, UserModelMessage } from "ai";
 import type { Agent, UIMessage } from "../agent";
 import { ref, type Ref } from "vue";
 
 export type Conversation = {
   id: string;
   title: string;
-  messages: UserModelMessage[];
+  messages: ModelMessage[];
   uiMessages: UIMessage[];
   updateTime: string;
   isNew: boolean;
@@ -33,12 +33,14 @@ export function useConversation(agent: Agent) {
   function switchConversation(conversation: Conversation) {
     deleteConversation(conversation);
     conversations.value.unshift(conversation);
+    save();
   }
 
   function deleteConversation(conversation: Conversation) {
     conversations.value = conversations.value.filter(
       (c) => c.id !== conversation.id,
     );
+    save();
   }
 
   function save() {
@@ -48,16 +50,27 @@ export function useConversation(agent: Agent) {
     // 检查新会话有没有消息，有消息才生成title。
     const userMessage = current.messages.find((m) => m.role === "user");
     if (userMessage) {
-      const title = userMessage.content?.text || userMessage.content || "";
-      current.title = title.slice(0, 10);
-      current.isNew = false;
+      if (current.isNew) {
+        const title = userMessage.content?.text || userMessage.content || "";
+        current.title = title.slice(0, 10);
+        current.isNew = false;
+      }
       current.updateTime = new Date().toLocaleString();
       localStorage.setItem($KEY, JSON.stringify(conversations.value));
-    } else {
-      // 会话无有效消息，则移除当前会话（不用再保存了，因为它从来没有保存成功过）
-      deleteConversation(current);
     }
   }
+
+  // 注册钩子函数
+  function syncMsgAndSave() {
+    const current = conversations.value[0];
+    current.messages = agent.messages;
+    current.uiMessages = agent.uiMessages;
+    save();
+  }
+
+  agent.$lifeCycle.on("chatStart", syncMsgAndSave);
+  agent.$lifeCycle.on("chatEnd", syncMsgAndSave);
+
   return {
     conversations,
     createConversation,

@@ -9,6 +9,8 @@ import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
 import { ref, type Ref } from "vue";
+import { useLifeCycle } from "./hooks/useLifeCycle";
+import { useConversation } from "./hooks/useConversation";
 
 /** 用户界面渲染的消息体 */
 export type UIMessage =
@@ -38,6 +40,10 @@ export class Agent {
   /** 用户界面渲染的消息体。 其中ai 的消息为 ref 的响应式数据， 根据流事件，进行实时更新 */
   uiMessages: UIMessage[] = [];
 
+  // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
+  $lifeCycle = useLifeCycle(this);
+  $conversation = useConversation(this);
+
   constructor() {}
 
   /** 设置大语言模型
@@ -52,6 +58,7 @@ export class Agent {
 
     this.messages.push({ role: "user", content: message });
     this.uiMessages.push({ role: "user", content: message });
+    this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
       messages: this.messages,
@@ -63,9 +70,10 @@ export class Agent {
       debug: this.debugStream,
       onFinish: async () => {
         // AI 返回 的 stream.response.message 就是ai返回的完整对话消息, 拼接到主消息列表
-        this.messages = this.messages.concat(
-          (await streamResult.response).messages,
-        );
+        const aiMessages = (await streamResult.response).messages;
+        this.messages = this.messages.concat(aiMessages);
+
+        this.$lifeCycle.emit("chatEnd", aiMessages);
         dp.resolve();
       },
     });
