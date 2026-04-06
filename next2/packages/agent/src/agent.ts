@@ -11,6 +11,7 @@ import { DelayedPromise } from "@ai-sdk/provider-utils";
 import { ref, type Ref } from "vue";
 import { useLifeCycle } from "./hooks/useLifeCycle";
 import { useConversation } from "./hooks/useConversation";
+import { usePromptManager } from "./hooks/promptManager";
 
 /** 用户界面渲染的消息体 */
 export type UIMessage =
@@ -43,6 +44,7 @@ export class Agent {
   // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
   $lifeCycle = useLifeCycle(this);
   $conversation = useConversation(this);
+  $promptManager = usePromptManager();
 
   constructor() {}
 
@@ -61,6 +63,7 @@ export class Agent {
     this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
+      prompt: this.$promptManager.getAll() as any,
       messages: this.messages,
       abortSignal: this.abortController.signal,
     });
