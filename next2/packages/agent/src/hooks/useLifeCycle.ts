@@ -1,4 +1,3 @@
-import type { ModelMessage, UserModelMessage } from "ai";
 import type { Agent } from "../agent";
 
 /** 在代理中埋点生命周期的钩子
@@ -7,17 +6,16 @@ import type { Agent } from "../agent";
  */
 export function useLifeCycle(agent: Agent) {
   const cbMap = {
-    chatStart: [] as any[],
-    chatEnd: [] as any[],
+    chatStart: [] as Function[], // 压入usr消息后触发
+    chatEnd: [] as Function[], // 压入ai消息后触发
+    reChat: [] as Function[], // 重新发起对话, 清除上次对话记录后触发
   };
 
-  function on(type: "chatStart", cb: (message: ModelMessage) => void): void;
-  function on(type: "chatEnd", cb: (messages: UserModelMessage) => void): void;
-  function on(type: "chatStart" | "chatEnd", cb: Function) {
+  function on(type: keyof typeof cbMap, cb: Function) {
     cbMap[type].push(cb);
   }
 
-  function emit(type: "chatStart" | "chatEnd", ...args: any[]) {
+  function emit(type: keyof typeof cbMap, ...args: any[]) {
     cbMap[type].forEach((cb) => cb(...args));
   }
 

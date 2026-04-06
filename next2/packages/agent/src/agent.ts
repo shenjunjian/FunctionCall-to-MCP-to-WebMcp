@@ -69,7 +69,7 @@ export class Agent {
     const visitor = new StreamVisitor({
       debug: this.debugStream,
       onFinish: async () => {
-        // AI 返回 的 stream.response.message 就是ai返回的完整对话消息, 拼接到主消息列表
+        // stream.response.message 就是ai-sdk 包装的ai 多轮对话消息, 拼接到**主消息列表**
         const aiMessages = (await streamResult.response).messages;
         this.messages = this.messages.concat(aiMessages);
 
@@ -77,17 +77,18 @@ export class Agent {
         dp.resolve();
       },
     });
-
+    // 立即返回的一个ref数据，拼接到 **UI消息列表**
+    const aiContent = visitor.traverse(streamResult);
     this.uiMessages.push({
       role: "assistant",
-      content: visitor.traverse(streamResult),
+      content: aiContent,
     });
 
     return dp.promise;
   }
 
   /** 取消当前对话， reason 可选，默认值为 "用户取消" */
-  stopChat(reason: string = "用户取消") {
+  cancelChat(reason: string = "用户取消") {
     this.abortController?.abort(reason);
   }
 
@@ -106,6 +107,8 @@ export class Agent {
 
     const lastUserMessage = this.messages[lastUserIndex] as UserModelMessage;
     this.messages = this.messages.slice(0, lastUserIndex);
+
+    this.$lifeCycle.emit("reChat");
 
     // 重新调用 chatStream
     await this.chatStream(lastUserMessage);
