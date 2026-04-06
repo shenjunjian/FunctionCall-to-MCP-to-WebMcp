@@ -10,6 +10,16 @@ import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
 import { ref, type Ref } from "vue";
 
+/** 用户界面渲染的消息体 */
+type UIMessage =
+  | {
+      role: "user";
+      content: ModelMessage;
+    }
+  | {
+      role: "assistant";
+      content: Ref<StartContent | undefined>;
+    };
 export class Agent {
   /** 调试流， 是否打印流数据 */
   private debugStream: boolean = false;
@@ -23,10 +33,10 @@ export class Agent {
   abortController?: AbortController;
 
   // **************** 消息管理 ****************
-  /** 对话消息, 包含用户消息和ai回复 */
+  /** 对话消息, 包含用户消息和ai回复。在ai 对话结束才一次性插入 */
   messages: ModelMessage[] = [];
-  /** 最后一次对话的响应数据 */
-  lastChat: Ref<StartContent | undefined> = ref(undefined);
+  /** 用户界面渲染的消息体。 其中ai 的消息为 ref 的响应式数据， 根据流事件，进行实时更新 */
+  uiMessages: UIMessage[] = [];
 
   constructor() {}
 
@@ -41,6 +51,7 @@ export class Agent {
     this.abortController = new AbortController();
 
     this.messages.push({ role: "user", content: message });
+    this.uiMessages.push({ role: "user", content: message });
 
     const streamResult = await this.mainAgent!.stream({
       messages: this.messages,
@@ -59,7 +70,10 @@ export class Agent {
       },
     });
 
-    this.lastChat = await visitor.traverse(streamResult);
+    this.uiMessages.push({
+      role: "assistant",
+      content: visitor.traverse(streamResult),
+    });
 
     return dp.promise;
   }
@@ -71,15 +85,18 @@ export class Agent {
 
   /** 重复上次对话 */
   async reLastChat() {
-    // 查找最后一条用户消息
-    let lastUserIndex = this.messages.findLastIndex(
+    // 截断UI 消息
+    let lastUserIndex = this.uiMessages.findLastIndex(
       (msg) => msg.role === "user",
     );
     if (lastUserIndex === -1) return;
+    this.uiMessages = this.uiMessages.slice(0, lastUserIndex);
+
+    // 截断对话消息，并获取最后一条用户消息
+    lastUserIndex = this.messages.findLastIndex((msg) => msg.role === "user");
+    if (lastUserIndex === -1) return;
 
     const lastUserMessage = this.messages[lastUserIndex] as UserModelMessage;
-
-    // 截断消息，不保留到最后一条用户消息
     this.messages = this.messages.slice(0, lastUserIndex);
 
     // 重新调用 chatStream
