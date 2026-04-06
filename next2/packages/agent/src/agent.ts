@@ -15,10 +15,7 @@ import { usePromptManager } from "./hooks/promptManager";
 
 /** 用户界面渲染的消息体 */
 export type UIMessage =
-  | {
-      role: "user";
-      content: UserModelMessage;
-    }
+  | UserModelMessage
   | {
       role: "assistant";
       content: Ref<StartContent | undefined>;
@@ -29,11 +26,11 @@ export class Agent {
 
   // **************** 智能体管理 ****************
   /** 主体智能体 */
-  mainAgent: ToolLoopAgent | null = null;
-  /** 智能体额外参数设置, 参考 ai-sdk 的 ToolLoopAgent() 的入参：https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent#parameters */
-  settings: ToolLoopAgentSettings = {} as any;
+  private mainAgent: ToolLoopAgent | null = null;
+  /** 智能体参数设置 */
+  private settings: ToolLoopAgentSettings = {} as any;
   /** 对话取消信号， eg. agent.abortSignal.abort() */
-  abortController?: AbortController;
+  private abortController?: AbortController;
 
   // **************** 消息管理 ****************
   /** 对话消息, 包含用户消息和ai回复。在ai 对话结束才一次性插入 */
@@ -46,20 +43,27 @@ export class Agent {
   $conversation = useConversation(this);
   $promptManager = usePromptManager();
 
-  constructor() {}
-
-  /** 设置大语言模型
-   *  @param model 大语言模型， eg. provider('modelId') 的返回值
+  /** 初始化智能体， 设置大语言模型
+   *  @param settings 智能体参数设置, 参考 ai-sdk 的 ToolLoopAgent() 的入参：https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent#parameters
+   *  其中，model:  设置大语言模型，必值项。  eg. xxProvider('modelId') 的返回值
+   *
+   *  如果后期需要修改，可以调用 agent.setAgent(newSettings)!
    */
-  setModel(model: LanguageModelV3) {
-    this.mainAgent = new ToolLoopAgent({ ...this.settings, model });
+  constructor(settings: ToolLoopAgentSettings) {
+    this.setAgent(settings);
+  }
+
+  /** 设置ToolLoopAgent */
+  setAgent(settings: ToolLoopAgentSettings) {
+    this.settings = settings;
+    this.mainAgent = new ToolLoopAgent(settings);
   }
   /** 发起对话， 参数 message 为标准的ai-sdk参数： string | Array<TextPart | ImagePart | FilePart> */
   async chatStream(message: UserModelMessage) {
     this.abortController = new AbortController();
 
-    this.messages.push({ role: "user", content: message });
-    this.uiMessages.push({ role: "user", content: message });
+    this.messages.push(message);
+    this.uiMessages.push(message);
     this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
