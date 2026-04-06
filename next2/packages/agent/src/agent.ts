@@ -11,10 +11,10 @@ import { DelayedPromise } from "@ai-sdk/provider-utils";
 import { ref, type Ref } from "vue";
 
 /** 用户界面渲染的消息体 */
-type UIMessage =
+export type UIMessage =
   | {
       role: "user";
-      content: ModelMessage;
+      content: UserModelMessage;
     }
   | {
       role: "assistant";
