@@ -9,32 +9,25 @@ import {
 import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { z } from "zod";
-
-// import { createOpenAI } from "@ai-sdk/openai";
-// const openai = createOpenAI({
-//   // custom settings, e.g.
-//   headers: {
-//     "header-name": "header-value",
-//   },
-// });
-
-// openai("gpt5");
+import { DelayedPromise } from "@ai-sdk/provider-utils";
+import { nextTick } from "vue";
 
 export class Agent {
   // **************** 智能体管理 ****************
-
-  /** 主体智能体， 用于与大语言模型交互 */
+  /** 主体智能体 */
   mainAgent: ToolLoopAgent | null = null;
-  /** 智能体额外参数设置,  */
+  /** 智能体额外参数设置, 参考 ai-sdk 的 ToolLoopAgent() 的入参：https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent#parameters */
   settings: ToolLoopAgentSettings = {} as any;
   /** 对话取消信号， eg. agent.abortSignal.abort() */
   abortSignal?: AbortSignal;
-  timeout?: number;
+
+  /** 调试流， 是否打印流数据 */
+  private debugStream: boolean = false;
 
   // **************** 消息管理 ****************
   /** 对话消息, 包含用户消息和ai回复 */
   messages: ModelMessage[] = [];
-
+  /** 最后一次对话的响应数据 */
   lastChat: StartContent = null;
 
   constructor() {}
@@ -45,22 +38,34 @@ export class Agent {
   setModel(model: LanguageModelV3) {
     this.mainAgent = new ToolLoopAgent({ ...this.settings, model });
   }
-  /** 对话 */
+  /** 对话， message 标准的ai-sdk参数： string | Array<TextPart | ImagePart | FilePart> */
   async chatStream(message: UserModelMessage) {
     this.abortSignal = new AbortController().signal;
 
     this.messages.push({ role: "user", content: message });
 
-    const stream = await this.mainAgent!.stream({
+    const streamResult = await this.mainAgent!.stream({
       messages: this.messages,
       abortSignal: this.abortSignal,
-      timeout: this.timeout,
     });
 
-    // AI 返回 的 stream.response.message 就是ai返回的完整对话消息。 可以直接压入messages, 适应的时候 可以精简
-    // this.messages.push(stream.response.message);
+    const dp = new DelayedPromise<void>();
+    const visitor = new StreamVisitor({
+      debug: this.debugStream,
+      onFinish: () => {
+        nextTick(() => {
+          // AI 返回 的 stream.response.message 就是ai返回的完整对话消息, 拼接到主消息列表
+          this.messages = this.messages.concat(
+            (await streamResult.response).messages,
+          );
+          dp.resolve();
+        });
+      },
+    });
 
-    this.messages.concat((await stream.response).message);
+    this.lastChat = await visitor.traverse(streamResult);
+
+    return dp.promise;
   }
 
   /** 取消当前对话， reason 可选，默认值为 "用户取消" */
