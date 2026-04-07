@@ -17,30 +17,33 @@ const $KEY = "next-conversation-private-key";
   2. 保存时，才检查新会话有没有消息，有消息才生成title。  无消息，证明会话一直未聊天，要移除掉它。
   */
 export function useConversation(agent: Agent) {
+  /** 最大会话数 */
+  const maxConversations = 20;
+
   // 加载历史会话 + 创建新会话
   const conversations: Ref<Conversation[]> = ref(
     JSON.parse(localStorage.getItem($KEY) || "[]"),
   );
   createConversation();
 
-  // 插入到队首，更新当前会话
+  /** 插入到队首，更新当前会话 */
   function createConversation() {
     const conversation = _create();
     conversations.value.unshift(conversation);
     return conversation;
   }
-  // 交换到队首，更新当前会话
+  /** 交换到队首，更新当前会话 */
   function switchConversation(conversation: Conversation) {
     deleteConversation(conversation);
     conversations.value.unshift(conversation);
-    _save(conversations);
+    _save(conversations, maxConversations);
   }
-
+  /** 删除会话 */
   function deleteConversation(conversation: Conversation) {
     conversations.value = conversations.value.filter(
       (c) => c.id !== conversation.id,
     );
-    _save(conversations);
+    _save(conversations, maxConversations);
   }
 
   // 注册钩子函数
@@ -48,13 +51,14 @@ export function useConversation(agent: Agent) {
     const current = conversations.value[0];
     current.messages = agent.messages;
     current.uiMessages = agent.uiMessages;
-    _save(conversations);
+    _save(conversations, maxConversations);
   }
 
   agent.$lifeCycle.on("chatStart", syncMsgAndSave);
   agent.$lifeCycle.on("chatEnd", syncMsgAndSave);
 
   return {
+    maxConversations,
     conversations,
     createConversation,
     switchConversation,
@@ -74,7 +78,7 @@ function _create() {
   };
 }
 
-function _save(conversations: Ref<Conversation[]>) {
+function _save(conversations: Ref<Conversation[]>, maxConversations: number) {
   const current = conversations.value[0];
   const userMessage = current.messages.find((m) => m.role === "user");
   if (!current || !userMessage) return;
@@ -85,5 +89,9 @@ function _save(conversations: Ref<Conversation[]>) {
     current.isNew = false;
   }
   current.updateTime = new Date().toLocaleString();
+  // 保持最多maxConversations个会话
+  if (conversations.value.length > maxConversations) {
+    conversations.value = conversations.value.slice(0, maxConversations);
+  }
   localStorage.setItem($KEY, JSON.stringify(conversations.value));
 }
