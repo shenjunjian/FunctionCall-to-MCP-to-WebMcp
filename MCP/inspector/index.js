@@ -55,12 +55,13 @@ const server = new McpServer(
 //     }
 //   },
 // );
+let count = 0;
 server.tool("get_weather", {}, () => {
   return {
     content: [
       {
         type: "text",
-        text: "查询指定城市的天气信息",
+        text: "查询指定城市的天气信息" + count++,
       },
     ],
   };

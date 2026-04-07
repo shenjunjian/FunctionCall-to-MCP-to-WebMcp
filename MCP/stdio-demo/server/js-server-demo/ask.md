@@ -30,3 +30,8 @@ const server = new McpServer({
    3.3 最后看到 node 启动index.js中的路径 **斜线问题**。  
       在inspector界面上， 将 e:\xxx\index.js 修改为 ：  e:/xxx/index.js  ，终于在 inspector 连接成功了。
        这2种路径才是正确的路径：   e:/xxx/index.js   e:\\xxx\\index.js
+
+ 4. stdio 模式的MCP server 是持续运行的，并非每次调用都需要重新启动。
+   4.1 node index.js 后，看到node进程并不退出
+   4.2 在tool中增加一个count变量计数，可以看到tools 调用的次数。
+  
