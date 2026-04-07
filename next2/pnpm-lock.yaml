@@ -91,6 +91,9 @@ importers:
       ai:
         specifier: ^6.0.146
         version: 6.0.146(zod@3.25.76)
+      json-schema-to-zod:
+        specifier: 2.8.1
+        version: 2.8.1
       vue:
         specifier: ^3.5.0
         version: 3.5.32(typescript@6.0.2)
@@ -2015,6 +2018,10 @@ packages:
 
   jose@6.2.2:
     resolution: {integrity: sha512-d7kPDd34KO/YnzaDOlikGpOurfF0ByC2sEV4cANCtdqLlTfBlw2p14O/5d/zv40gJPbIQxfES3nSx1/oYNyuZQ==}
+
+  json-schema-to-zod@2.8.1:
+    resolution: {integrity: sha512-fRr1mHgZ7hboLKBUdR428gd9dIHUFGivUqOeiDcSmyXkNZCtB1uGaZLvsjZ4GaN5pwBIs+TGIOf6s+Rp5/R/zA==}
+    hasBin: true
 
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
@@ -5695,6 +5702,8 @@ snapshots:
   jiti@2.6.1: {}
 
   jose@6.2.2: {}
+
+  json-schema-to-zod@2.8.1: {}
 
   json-schema-traverse@1.0.0: {}
 

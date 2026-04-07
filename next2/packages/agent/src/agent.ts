@@ -74,7 +74,7 @@ export class Agent {
     this.messages.push(message);
     this.uiMessages.push(message);
 
-    this.$lifeCycle.emit("chatStart", message);
+   await this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
       messages: this.messages,
@@ -89,7 +89,7 @@ export class Agent {
         const aiMessages = (await streamResult.response).messages;
         this.messages = this.messages.concat(aiMessages);
 
-        this.$lifeCycle.emit("chatEnd", aiMessages);
+       await this.$lifeCycle.emit("chatEnd", aiMessages);
         dp.resolve();
       },
     });
@@ -124,7 +124,7 @@ export class Agent {
     const lastUserMessage = this.messages[lastUserIndex] as UserModelMessage;
     this.messages = this.messages.slice(0, lastUserIndex);
 
-    this.$lifeCycle.emit("reChat");
+   await this.$lifeCycle.emit("reChat");
 
     // 重新调用 chatStream
     await this.chatStream(lastUserMessage);

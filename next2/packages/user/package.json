@@ -16,10 +16,8 @@
     "dist"
   ],
   "type": "module",
-  "exports": {
-    ".": "./dist/index.mjs",
-    "./package.json": "./package.json"
-  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "publishConfig": {
     "access": "public"
   },

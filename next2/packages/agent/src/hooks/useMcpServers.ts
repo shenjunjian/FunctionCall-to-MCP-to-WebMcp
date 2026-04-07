@@ -8,7 +8,8 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory";
 import { Client } from "@modelcontextprotocol/sdk/client";
 import type { Agent } from "../agent";
 import type { ToolSet } from "ai";
-
+import { jsonSchemaToZod } from "json-schema-to-zod";
+import { z } from "zod";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: Agent) {
   const mcpServers = ref<NextMcpServer[]>([]);
@@ -35,7 +36,7 @@ export function useMcpServers(agent: Agent) {
     if (server.type === "page") {
       // 从window.navigator 获取工具
       const { server, client } = await createPagePair();
-      const clientTools = client.listTools();
+      const clientTools =await client.listTools();  // TODO: 返回的是数组 {} mcp官方的， 不是ai-sdk所需要的
       console.log(clientTools, "本window页面的工具");
       return clientTools;
     }
@@ -52,16 +53,7 @@ export function useMcpServers(agent: Agent) {
   };
 }
 
-/** 从MCP服务中获取工具 */
-export function getToolsFromServer(server: NextMcpServer) {
-  if (server.type === "page") {
-    // 从window.navigator 获取工具
-    const { server, client } = await createPagePair();
-    const clientTools = client.listTools();
-    console.log(clientTools, "本window页面的工具");
-    return clientTools;
-  }
-}
+ 
 
 /** 快速创建一个基于内存连接的MCPServer和MCPClient pair */
 export async function createPagePair() {
@@ -90,29 +82,28 @@ export async function createPagePair() {
   return { server, client };
 }
 
-const registeredTools: RegisteredTool[] = [];
 
 function refreshTools(server: McpServer) {
-  // 先取消注册所有工具
-  registeredTools.forEach((tool) => {
-    tool.remove();
-  });
+  
 
   const client = navigator.modelContextTesting!;
 
   client.listTools().forEach((tool) => {
-    const registeredTool = server.registerTool(
+    const zodSchema = jsonSchemaToZod(JSON.parse(tool.inputSchema as string),
+     { zodVersion: 3 } as any);
+    // 使用 new Function 将字符串转换为实际的 Zod 对象
+    const zodObject = new Function("z", `return ${zodSchema}`)(z);
+    
+    server.registerTool(
       tool.name,
       {
         description: tool.description,
-        inputSchema: tool.inputSchema as any,
+        inputSchema: zodObject,
       },
       async (...args) => {
         return client.executeTool(tool.name, ...args);
       },
     );
-    // 收藏起来，方便后续取消注册
-    registeredTools.push(registeredTool);
   });
 }
 /** 将当前页面的 McpServer 工具代理到 modelContextTesting 上

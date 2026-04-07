@@ -15,8 +15,10 @@ export function useLifeCycle(agent: Agent) {
     cbMap[type].push(cb);
   }
 
-  function emit(type: keyof typeof cbMap, ...args: any[]) {
-    cbMap[type].forEach((cb) => cb(...args));
+  async function emit(type: keyof typeof cbMap, ...args: any[]) {
+    for (const cb of cbMap[type]) {
+      await cb(...args);
+    }
   }
 
   return {
