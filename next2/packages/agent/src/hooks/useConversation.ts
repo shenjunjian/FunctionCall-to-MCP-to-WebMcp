@@ -33,31 +33,14 @@ export function useConversation(agent: Agent) {
   function switchConversation(conversation: Conversation) {
     deleteConversation(conversation);
     conversations.value.unshift(conversation);
-    save();
+    _save(conversations);
   }
 
   function deleteConversation(conversation: Conversation) {
     conversations.value = conversations.value.filter(
       (c) => c.id !== conversation.id,
     );
-    save();
-  }
-
-  function save() {
-    const current = conversations.value[0];
-    if (!current) return;
-
-    // 检查新会话有没有消息，有消息才生成title。
-    const userMessage = current.messages.find((m) => m.role === "user");
-    if (userMessage) {
-      if (current.isNew) {
-        const title = userMessage.content?.text || userMessage.content || "";
-        current.title = title.slice(0, 10);
-        current.isNew = false;
-      }
-      current.updateTime = new Date().toLocaleString();
-      localStorage.setItem($KEY, JSON.stringify(conversations.value));
-    }
+    _save(conversations);
   }
 
   // 注册钩子函数
@@ -65,7 +48,7 @@ export function useConversation(agent: Agent) {
     const current = conversations.value[0];
     current.messages = agent.messages;
     current.uiMessages = agent.uiMessages;
-    save();
+    _save(conversations);
   }
 
   agent.$lifeCycle.on("chatStart", syncMsgAndSave);
@@ -79,6 +62,7 @@ export function useConversation(agent: Agent) {
   };
 }
 
+// ************ 内部函数/纯函数 ************
 function _create() {
   return {
     id: Date.now().toString(),
@@ -88,4 +72,18 @@ function _create() {
     updateTime: new Date().toLocaleString(),
     isNew: true,
   };
+}
+
+function _save(conversations: Ref<Conversation[]>) {
+  const current = conversations.value[0];
+  const userMessage = current.messages.find((m) => m.role === "user");
+  if (!current || !userMessage) return;
+
+  if (current.isNew) {
+    const title = userMessage.content?.text || userMessage.content || "";
+    current.title = title.slice(0, 10);
+    current.isNew = false;
+  }
+  current.updateTime = new Date().toLocaleString();
+  localStorage.setItem($KEY, JSON.stringify(conversations.value));
 }
