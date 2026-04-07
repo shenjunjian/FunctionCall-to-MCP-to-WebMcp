@@ -41,13 +41,14 @@ export class Agent {
   // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
   $lifeCycle = useLifeCycle(this);
   $conversation = useConversation(this);
-  $promptManager = usePromptManager();
+  $promptManager = usePromptManager(this);
 
   /** 初始化智能体， 设置大语言模型
    *  @param settings 智能体参数设置, 参考 ai-sdk 的 ToolLoopAgent() 的入参：https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent#parameters
+   *
    *  其中，model:  设置大语言模型，必值项。  eg. xxProvider('modelId') 的返回值
    *
-   *  如果后期需要修改，可以调用 agent.setAgent(newSettings)!
+   *  如果后期需要修改智能体参数，可以调用 agent.setAgent(newSettings)!
    */
   constructor(settings: ToolLoopAgentSettings) {
     this.setAgent(settings);
