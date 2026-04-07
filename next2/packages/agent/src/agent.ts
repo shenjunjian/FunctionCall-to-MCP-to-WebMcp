@@ -1,4 +1,3 @@
-import type { LanguageModelV3 } from "@ai-sdk/provider";
 import {
   ToolLoopAgent,
   type ModelMessage,
@@ -8,10 +7,10 @@ import {
 import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
-import { ref, type Ref } from "vue";
+import { type Ref } from "vue";
 import { useLifeCycle } from "./hooks/useLifeCycle";
 import { useConversation } from "./hooks/useConversation";
-import { usePromptManager } from "./hooks/promptManager";
+import { usePromptManager } from "./hooks/usePromptManager";
 
 /** 用户界面渲染的消息体 */
 export type UIMessage =
