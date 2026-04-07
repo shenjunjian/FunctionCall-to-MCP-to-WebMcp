@@ -1,3 +1,5 @@
+import type { Agent } from "../agent";
+
 export class PromptManager {
   /** 固定系统提示词 */
   private staticPrompt = "";
@@ -35,6 +37,18 @@ ${this.tempPrompt}
   }
 }
 
-export function usePromptManager() {
-  return new PromptManager();
+export function usePromptManager(agent: Agent) {
+  const promptManager = new PromptManager();
+
+  // 对话开始时，自动添加系统提示词。
+  // ToolLoopAgent 没有system属性了， 且不允许同时设置 prompt, messages属性。 所以才手动拼接messages数组
+  agent.$lifeCycle.on("chatStart", () => {
+    agent.messages = agent.messages.filter((msg) => msg.role !== "system");
+    agent.messages.unshift({
+      role: "system",
+      content: promptManager.getAll(),
+    });
+  });
+
+  return promptManager;
 }

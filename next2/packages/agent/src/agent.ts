@@ -67,7 +67,6 @@ export class Agent {
     this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
-      prompt: this.$promptManager.getAll() as any,
       messages: this.messages,
       abortSignal: this.abortController.signal,
     });

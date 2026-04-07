@@ -1,18 +1,29 @@
 import { registerOnPage } from "user";
 import { z } from "zod";
 
+import { Agent } from "agent";
+import { createDeepSeek } from "@ai-sdk/deepseek";
+
 const { server, client } = await registerOnPage({});
 
 window._server = server;
 window._client = client;
 window._z = z;
 
-setTimeout(async () => {
-  console.log("Calling client.listTools()...");
-  try {
-    const tools = await client.listTools();
-    console.log("Tools:", tools);
-  } catch (error) {
-    console.error("Error calling listTools:", error);
-  }
-}, 1000);
+const deepseek = createDeepSeek({
+  apiKey: "sk-b462f8de7b364629b3136312c106655a",
+  baseURL: "https://api.deepseek.com",
+});
+
+const agent = new Agent({
+  model: deepseek("deepseek-chat"),
+});
+
+await agent.chatStream({
+  role: "user",
+  content: "李白",
+});
+
+console.log(agent);
+
+window._agent = agent;

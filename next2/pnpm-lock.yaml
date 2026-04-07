@@ -24,9 +24,24 @@ importers:
 
   apps/website:
     dependencies:
+      '@ai-sdk/deepseek':
+        specifier: ^2.0.27
+        version: 2.0.27(zod@3.25.76)
+      '@ai-sdk/openai':
+        specifier: ^3.0.50
+        version: 3.0.50(zod@3.25.76)
+      '@ai-sdk/provider':
+        specifier: ^3.0.8
+        version: 3.0.8
+      '@ai-sdk/provider-utils':
+        specifier: ^4.0.22
+        version: 4.0.22(zod@3.25.76)
       agent:
         specifier: workspace:*
         version: link:../../packages/agent
+      ai:
+        specifier: ^6.0.146
+        version: 6.0.146(zod@3.25.76)
       user:
         specifier: workspace:*
         version: link:../../packages/user
