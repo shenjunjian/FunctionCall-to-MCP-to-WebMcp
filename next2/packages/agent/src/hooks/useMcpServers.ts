@@ -6,11 +6,30 @@ import {
 } from "@modelcontextprotocol/sdk/server/mcp";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory";
 import { Client } from "@modelcontextprotocol/sdk/client";
+import type { Agent } from "../agent";
+import type { ToolSet } from "ai";
 
 /** 管理自定义的MCP服务 */
-export function useMcpServers() {
+export function useMcpServers(agent: Agent) {
   const mcpServers = ref<NextMcpServer[]>([]);
   const ignoreToolNames = ref<string[]>([]);
+  // 最终传递给 ToolLoopAgent 的工具，不要修改引用地址
+  const tools: ToolSet = {};
+
+  agent.$lifeCycle.on("chatStart", async () => {
+    // 清空工具
+    Object.keys(tools).forEach((key) => {
+      delete tools[key];
+    });
+    // 合并初始工具
+    if (agent.settings.tools) {
+      Object.assign(tools, agent.settings.tools);
+    }
+    // 合并 mcpServers 中的工具
+    for (const server of mcpServers.value) {
+      Object.assign(tools, await getToolsFromServer(server));
+    }
+  });
 
   async function getToolsFromServer(server: NextMcpServer) {
     if (server.type === "page") {
@@ -21,13 +40,14 @@ export function useMcpServers() {
       return clientTools;
     }
 
-    // 不匹配则返回空数组
-    return [];
+    // 不匹配则返回空对象
+    return {};
   }
 
   return {
     mcpServers,
     ignoreToolNames,
+    tools,
     getToolsFromServer,
   };
 }

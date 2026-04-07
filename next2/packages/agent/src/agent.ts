@@ -11,6 +11,7 @@ import { type Ref } from "vue";
 import { useLifeCycle } from "./hooks/useLifeCycle";
 import { useConversation } from "./hooks/useConversation";
 import { usePromptManager } from "./hooks/usePromptManager";
+import { useMcpServers } from "./hooks/useMcpServers";
 
 /** 用户界面渲染的消息体 */
 export type UIMessage =
@@ -27,7 +28,7 @@ export class Agent {
   /** 主体智能体 */
   private mainAgent: ToolLoopAgent | null = null;
   /** 智能体参数设置 */
-  private settings: ToolLoopAgentSettings = {} as any;
+  settings: ToolLoopAgentSettings = {} as any;
   /** 对话取消信号， eg. agent.abortSignal.abort() */
   private abortController?: AbortController;
 
@@ -41,11 +42,13 @@ export class Agent {
   $lifeCycle = useLifeCycle(this);
   $conversation = useConversation(this);
   $promptManager = usePromptManager(this);
+  $mcpServers = useMcpServers(this);
 
   /** 初始化智能体， 设置大语言模型
    *  @param settings 智能体参数设置, 参考 ai-sdk 的 ToolLoopAgent() 的入参：https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent#parameters
    *
-   *  其中，model:  设置大语言模型，必值项。  eg. xxProvider('modelId') 的返回值
+   * @requires
+   * model:  设置大语言模型，必值项。  eg. xxProvider('modelId') 的返回值
    *
    *  如果后期需要修改智能体参数，可以调用 agent.setAgent(newSettings)!
    */
@@ -56,7 +59,13 @@ export class Agent {
   /** 设置ToolLoopAgent */
   setAgent(settings: ToolLoopAgentSettings) {
     this.settings = settings;
-    this.mainAgent = new ToolLoopAgent(settings);
+    if (settings.tools) {
+      Object.assign(this.$mcpServers.tools, settings.tools);
+    }
+    this.mainAgent = new ToolLoopAgent({
+      ...settings,
+      tools: this.$mcpServers.tools,
+    });
   }
   /** 发起对话， 参数 message 为标准的ai-sdk参数： string | Array<TextPart | ImagePart | FilePart> */
   async chatStream(message: UserModelMessage) {
@@ -64,6 +73,7 @@ export class Agent {
 
     this.messages.push(message);
     this.uiMessages.push(message);
+
     this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
