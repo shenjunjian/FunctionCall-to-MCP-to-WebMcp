@@ -24,6 +24,9 @@ importers:
 
   apps/website:
     dependencies:
+      agent:
+        specifier: workspace:*
+        version: link:../../packages/agent
       user:
         specifier: workspace:*
         version: link:../../packages/user

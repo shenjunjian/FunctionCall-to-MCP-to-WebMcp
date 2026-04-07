@@ -24,21 +24,9 @@ const server = new McpServer({
  在 js-client-demo中，配置上当前 Index.js 的路径， 通过 client来启动这个js文件。
 
  3. 如何通过 @modelcontextprotocol/inspector  来连接 stdio 模式的MCP server。
-
-4. 把index.js 编译为 standalone 模式
-
-使用 esbuild 进行打包编译：
-
-```bash
-# 安装依赖
-pnpm add -D typescript esbuild
-
-# 创建 index.ts (从 index.js 转换为 TypeScript)
-
-# 创建 build.js 构建脚本
-
-# 运行构建
-node build.js
-```
-
-编译后的文件为 `index.standalone.js`，这是一个自包含的 bundle，包含了所有依赖。
+   折腾好久才试成功。
+   3.1 先怀疑需要编译为 standalone 模式, 后证明不需要，只需要在package.json中添加 type="module" 即可。
+   3.2 index.js不允许包含console.log 等语句，否则会报错。  需要使用console.error 来输出错误信息。
+   3.3 最后看到 node 启动index.js中的路径 **斜线问题**。  
+      在inspector界面上， 将 e:\xxx\index.js 修改为 ：  e:/xxx/index.js  ，终于在 inspector 连接成功了。
+       这2种路径才是正确的路径：   e:/xxx/index.js   e:\\xxx\\index.js
