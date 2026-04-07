@@ -3,10 +3,15 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 
 // Create server instance
-const server = new McpServer({
-  name: "weather",
-  version: "1.0.0",
-});
+const server = new McpServer(
+  {
+    name: "weather",
+    version: "1.0.0",
+  },
+  {
+    capabilities: { tools: {} },
+  },
+);
 
 // 注册工具
 server.registerTool(
@@ -56,10 +61,7 @@ async function startServer() {
   try {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error("MCP server started successfully with stdio transport");
-  } catch (error) {
-    console.error("Failed to start MCP server:", error);
-  }
+  } catch (error) {}
 }
 
 startServer();
