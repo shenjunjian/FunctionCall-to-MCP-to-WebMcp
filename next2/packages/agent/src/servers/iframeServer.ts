@@ -14,7 +14,7 @@ export function buildIFrameTools() {
     console.error("iframePort 未初始化, 请调用 addMcpServer 来添加 mcpServer");
     return {} as ToolSet;
   }
-  // GLOBAL-3
+  // IFRAME-MSG-FLOW-3
   listToolPromise = new DelayedPromise<ToolSet>(); // 重置 listToolPromise
   iframePort.postMessage({ type: "listTools" });
 
@@ -23,7 +23,7 @@ export function buildIFrameTools() {
 
 /** 在Agent侧建立一个通道，可以连接到 window.parent */
 export function initIframeChannel() {
-  // GLOBAL-1
+  // IFRAME-MSG-FLOW-1
   const channel = new MessageChannel();
 
   window.parent.postMessage({ type: "connect" }, "*", [channel.port2]);
@@ -35,7 +35,7 @@ export function initIframeChannel() {
   );
 
   iframePort.onmessage = (event) => {
-    // GLOBAL-5
+    // IFRAME-MSG-FLOW-5
     if (event.data.type === "listToolsResult") {
       const tools: ToolSet = {};
       event.data.tools.forEach((currTool) => {
@@ -57,9 +57,14 @@ export function initIframeChannel() {
       });
 
       listToolPromise?.resolve(tools);
-    } else if (event.data.type === "callToolResult") {
-      // GLOBAL-7
-      callToolPromise?.resolve(event.data.result);
+    }
+    // IFRAME-MSG-FLOW-7
+    else if (event.data.type === "callToolResult") {
+      if (event.data.error) {
+        callToolPromise?.reject(event.data.error);
+      } else {
+        callToolPromise?.resolve(event.data.result);
+      }
     }
   };
 }
