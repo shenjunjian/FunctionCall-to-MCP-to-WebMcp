@@ -23,21 +23,21 @@ export async function registerOnWebAgent(option: RegisterOnWebAgentOption) {
   }
   isRegistered = true;
 
-  const { server, client } = registerOnPage({});
+  // const { server, client } = registerOnPage({});
 
-  const { transport, sessionId } = await createStreamProxy({
-    client,
-    url: option.url,
-    sessionId: option.sessionId,
-  });
+  // const { transport, sessionId } = await createStreamProxy({
+  //   client,
+  //   url: option.url,
+  //   sessionId: option.sessionId,
+  // });
 
-  transport.onerror = async (error: Error) => {
-    option.onError?.(error);
-  };
+  // transport.onerror = async (error: Error) => {
+  //   option.onError?.(error);
+  // };
 
-  return {
-    server,
-    client,
-    sessionId,
-  };
+  // return {
+  //   server,
+  //   client,
+  //   sessionId,
+  // };
 }

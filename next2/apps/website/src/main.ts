@@ -21,27 +21,27 @@ const agent = new Agent({
 //   content: "李白",
 // });
 
-console.log(agent);
+console.log("主页面agent", agent);
 
 window._agent = agent;
 // _agent.$mcpServers.mcpServers.value.push({type:'page', name:'xxxx 系统' })
 
-// navigator.modelContext.registerTool({
-//     name: "get-color",
-//     description: "获取当前颜色",
-//     inputSchema: { type: "object", properties: {} },
-//     async execute() {
-//       return {
-//         content: [
-//           {
-//             type: "text",
-//             text: `当前红色, from buildin-modelcontext`,
-//           },
-//         ],
-//       };
-//     },
-//   });
-// _agent.$mcpServers.mcpServers.value.push({type:'page', name:'xxxx 系统'})
+navigator.modelContext.registerTool({
+  name: "get-color",
+  description: "获取当前颜色",
+  inputSchema: { type: "object", properties: {} },
+  async execute() {
+    return {
+      content: [
+        {
+          type: "text",
+          text: `当前红色, from buildin-modelcontext`,
+        },
+      ],
+    };
+  },
+});
+agent.$mcpServers.mcpServers.value.push({ type: "page", name: "xxxx 系统" });
 
 // _agent.chatStream({
 //   role: "user",

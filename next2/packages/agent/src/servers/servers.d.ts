@@ -1,36 +1,34 @@
 interface BaseServer {
+  /** 服务id */
   id?: string;
+  /** 服务名称 */
   name: string;
 }
 
-/** 同页面服务 */
+/** 同页面服务, 每个Agent中只能有一个。 */
 export interface PageServer extends BaseServer {
   type: "page";
-  /** 服务名称 */
-  name: string;
 }
 
-/** iframe 服务 */
+/** iframe 服务, 每个Agent中只能有一个。 */
 export interface IframeServer extends BaseServer {
   type: "iframe";
-  /** 服务名称 */
-  name: string;
 }
 
 export interface StreamableHttpServer extends BaseServer {
-  type: "streamable-ttp";
-  /** 服务名称 */
-  name: string;
-  /** 会话id */
+  type: "streamable-http";
+  /** 请求url, 可包含sessionId */
   url: string;
+  /** 请求头 */
+  headers?: Record<string, string>;
 }
 
 export interface SSEServer extends BaseServer {
   type: "sse";
-  /** 服务名称 */
-  name: string;
-  /** 会话id */
+  /** 请求url, 可包含sessionId */
   url: string;
+  /** 请求头 */
+  headers?: Record<string, string>;
 }
 
 export type NextMcpServer =
