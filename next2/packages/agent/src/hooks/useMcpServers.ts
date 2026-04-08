@@ -5,9 +5,9 @@ import type { ToolSet } from "ai";
 import { buildPageTools } from "../servers/pageServer";
 import {
   buildIFrameTools,
-  closeIframeChannel,
+  // closeIframeChannel,
   initIframeChannel,
-} from "../servers/iframeServer";
+} from "../servers/iframe2Server";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: Agent) {
   /** 所有MCP服务， 尽量不要直接操作mcpServers, 而是调用 addMcpServer(server)*/
@@ -38,7 +38,7 @@ export function useMcpServers(agent: Agent) {
     mcpServers.value = mcpServers.value.filter((s) => s !== server);
 
     if (server.type === "iframe") {
-      closeIframeChannel();
+      // closeIframeChannel();
     }
   }
   /** 获取MCP服务的工具 */

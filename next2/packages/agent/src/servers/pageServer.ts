@@ -1,4 +1,4 @@
-import { jsonSchema, tool, type ToolSet } from "ai";
+import { jsonSchema, tool, type ToolExecutionOptions, type ToolSet } from "ai";
 
 /** 构建本window页面的工具集 */
 export function buildPageTools() {
@@ -9,7 +9,7 @@ export function buildPageTools() {
       description: currTool.description,
       inputSchema: jsonSchema(JSON.parse(currTool.inputSchema as string)),
       // params是入参， aiContext 包含了 {toolCallId, messages,abortSignal}
-      execute: async (params: any, aiContext: any) => {
+      execute: async (params: any, aiContext: ToolExecutionOptions) => {
         return client.executeTool(currTool.name, JSON.stringify(params)); // webmcp规范， 参数要字符串化。
       },
     });
