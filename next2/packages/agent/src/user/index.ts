@@ -17,7 +17,7 @@ export interface RegisterOnPageOption {
   webAgentAble?: boolean;
   /** 远程遥控的页面url eg. https://agent.opentiny.design/api/v1/webmcp-trial/mcp */
   url?: string;
-  /** 远程遥控的会话id,可选 */
+  /** 远程遥控的会话id,可选。 填写后，将固定sessionId */
   sessionId?: string;
 }
 let isRegistered = false;
