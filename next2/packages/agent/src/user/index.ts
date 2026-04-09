@@ -1,8 +1,8 @@
 import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
 import {
-  connectWebAgent,
   createChannelServer,
   createMcpServerClientPair,
+  connectWebAgent,
   proxyMcpServer,
 } from "./helper";
 
