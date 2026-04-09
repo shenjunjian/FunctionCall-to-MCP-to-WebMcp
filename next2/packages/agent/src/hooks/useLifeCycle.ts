@@ -1,10 +1,10 @@
-import type { Agent } from "../agent";
+import type { NextAgent } from "../agent";
 
 /** 在代理中埋点生命周期的钩子
  * 1. 对话开始
  * 2. 对话结束
  */
-export function useLifeCycle(agent: Agent) {
+export function useLifeCycle(agent: NextAgent) {
   const cbMap = {
     chatStart: [] as Function[], // 压入usr消息后触发
     chatEnd: [] as Function[], // 压入ai消息后触发

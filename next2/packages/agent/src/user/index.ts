@@ -6,7 +6,7 @@ import {
   proxyMcpServer,
 } from "./helper";
 
-interface RegisterOnPageOption {
+export interface RegisterOnPageOption {
   /** 系统名称，会显示在插件系统中。 eg. xx 智能化页面 */
   name: string;
   /** 是否支持 iframe 连接，默认支持 iframe 连接 */
@@ -16,7 +16,7 @@ interface RegisterOnPageOption {
   /** 是否支持 web-agent 连接，默认支持 web-agent 连接 */
   webAgentAble?: boolean;
   /** 远程遥控的页面url eg. https://agent.opentiny.design/api/v1/webmcp-trial/mcp */
-  url: string;
+  url?: string;
   /** 远程遥控的会话id,可选 */
   sessionId?: string;
 }

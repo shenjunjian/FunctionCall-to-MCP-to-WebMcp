@@ -1,4 +1,4 @@
-import { Agent } from "agent";
+import { NextAgent } from "agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 
 const deepseek = createDeepSeek({
@@ -6,7 +6,7 @@ const deepseek = createDeepSeek({
   baseURL: "https://api.deepseek.com",
 });
 
-const agent = new Agent({
+const agent = new NextAgent({
   model: deepseek("deepseek-chat"),
 });
 

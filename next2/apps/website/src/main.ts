@@ -1,9 +1,12 @@
-import { registerOnPage } from "user";
+import { registerOnPage } from "agent";
 import { z } from "zod";
 
-import { Agent } from "agent";
+import { NextAgent } from "agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
-await registerOnPage({});
+await registerOnPage({
+  name: "xxxx 系统",
+  iframeAble: true,
+});
 
 window._z = z;
 
@@ -12,7 +15,7 @@ const deepseek = createDeepSeek({
   baseURL: "https://api.deepseek.com",
 });
 
-const agent = new Agent({
+const agent = new NextAgent({
   model: deepseek("deepseek-chat"),
 });
 

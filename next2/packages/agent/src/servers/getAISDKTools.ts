@@ -19,16 +19,6 @@ export const getAISDKTools = async (client: Client): Promise<ToolSet> => {
     const listToolsResult = await client.listTools();
 
     for (const { name, description, inputSchema } of listToolsResult.tools) {
-      const execute = async (
-        args: any,
-        options: ToolExecutionOptions,
-      ): Promise<any> => {
-        return client.callTool(
-          { name, arguments: args },
-          { signal: options?.abortSignal },
-        );
-      };
-
       tools[name] = dynamicTool({
         description,
         inputSchema: jsonSchema({
@@ -36,7 +26,15 @@ export const getAISDKTools = async (client: Client): Promise<ToolSet> => {
           properties: (inputSchema.properties as Record<string, any>) ?? {},
           additionalProperties: false,
         }),
-        execute,
+        execute: async (
+          args: any,
+          options: ToolExecutionOptions,
+        ): Promise<any> => {
+          return client.callTool(
+            { name, arguments: args },
+            { signal: options?.abortSignal },
+          );
+        },
       });
     }
 

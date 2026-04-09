@@ -9,7 +9,6 @@
     "preview": "vp preview"
   },
   "dependencies": {
-    "user": "workspace:*",
     "agent": "workspace:*",
     "zod": "^3.25.76",
     "ai": "^6.0.146",

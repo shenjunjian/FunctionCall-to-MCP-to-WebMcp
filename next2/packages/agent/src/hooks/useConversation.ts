@@ -1,5 +1,5 @@
 import type { ModelMessage, UserModelMessage } from "ai";
-import type { Agent, UIMessage } from "../agent";
+import type { NextAgent, UIMessage } from "../agent";
 import { ref, type Ref } from "vue";
 
 export type Conversation = {
@@ -16,7 +16,7 @@ const $KEY = "next-conversation-private-key";
   1. 加载时，创建一个新会话，压入到队列头， 但不记录到本地存储。
   2. 保存时，才检查新会话有没有消息，有消息才生成title。  无消息，证明会话一直未聊天，要移除掉它。
   */
-export function useConversation(agent: Agent) {
+export function useConversation(agent: NextAgent) {
   /** 最大会话数 */
   const maxConversations = 20;
 

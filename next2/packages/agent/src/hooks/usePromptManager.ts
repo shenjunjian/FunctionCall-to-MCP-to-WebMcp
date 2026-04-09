@@ -1,4 +1,4 @@
-import type { Agent } from "../agent";
+import type { NextAgent } from "../agent";
 
 export class PromptManager {
   /** 固定系统提示词 */
@@ -37,7 +37,7 @@ ${this.tempPrompt}
   }
 }
 
-export function usePromptManager(agent: Agent) {
+export function usePromptManager(agent: NextAgent) {
   const promptManager = new PromptManager();
 
   // 对话开始时，自动添加系统提示词。

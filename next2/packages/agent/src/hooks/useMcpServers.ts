@@ -1,11 +1,11 @@
 import { ref } from "vue";
 import type { NextMcpServer } from "../servers/servers";
-import type { Agent } from "../agent";
+import type { NextAgent } from "../agent";
 import type { ToolSet } from "ai";
 import { buildPageTools } from "../servers/pageServer";
 import { buildIFrameTools, initIframeChannel } from "../servers/iframeServer";
 /** 管理自定义的MCP服务 */
-export function useMcpServers(agent: Agent) {
+export function useMcpServers(agent: NextAgent) {
   /** 所有MCP服务， 尽量不要直接操作mcpServers, 而是调用 addMcpServer(server)*/
   const mcpServers = ref<NextMcpServer[]>([]);
   const ignoreToolNames = ref<string[]>([]);
