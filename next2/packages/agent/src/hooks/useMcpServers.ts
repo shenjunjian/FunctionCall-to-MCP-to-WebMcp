@@ -3,11 +3,7 @@ import type { NextMcpServer } from "../servers/servers";
 import type { Agent } from "../agent";
 import type { ToolSet } from "ai";
 import { buildPageTools } from "../servers/pageServer";
-import {
-  buildIFrameTools,
-  // closeIframeChannel,
-  initIframeChannel,
-} from "../servers/iframe2Server";
+import { buildIFrameTools, initIframeChannel } from "../servers/iframeServer";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: Agent) {
   /** 所有MCP服务， 尽量不要直接操作mcpServers, 而是调用 addMcpServer(server)*/
@@ -24,7 +20,7 @@ export function useMcpServers(agent: Agent) {
     mcpServers.value.push(server);
 
     if (server.type === "iframe") {
-      initIframeChannel();
+      initIframeChannel(server.endpoint || "endpoint");
     }
   }
   /** 添加MCP服务 */
@@ -36,10 +32,6 @@ export function useMcpServers(agent: Agent) {
     if (!server) return;
 
     mcpServers.value = mcpServers.value.filter((s) => s !== server);
-
-    if (server.type === "iframe") {
-      // closeIframeChannel();
-    }
   }
   /** 获取MCP服务的工具 */
   async function getToolsFromServer(server: NextMcpServer) {
@@ -61,13 +53,15 @@ export function useMcpServers(agent: Agent) {
       delete tools[key];
     });
     // 合并初始工具
-    if (agent.settings.tools) {
-      Object.assign(tools, agent.settings.tools);
-    }
+    Object.assign(tools, agent.settings.tools || {});
     // 合并 mcpServers 中的工具
     for (const server of mcpServers.value) {
       Object.assign(tools, await getToolsFromServer(server));
     }
+    // 移除忽略的工具
+    ignoreToolNames.value.forEach((name) => {
+      delete tools[name];
+    });
   });
 
   return {

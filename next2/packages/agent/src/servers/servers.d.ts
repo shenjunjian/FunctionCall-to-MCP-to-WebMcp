@@ -13,6 +13,8 @@ export interface PageServer extends BaseServer {
 /** iframe 服务, 每个Agent中只能有一个。 */
 export interface IframeServer extends BaseServer {
   type: "iframe";
+  /** iframe连接时，约定的endpoint 名称, 默认值为 "endpoint" */
+  endpoint?: string;
 }
 
 export interface StreamableHttpServer extends BaseServer {

@@ -1,10 +1,10 @@
 import { Client } from "@modelcontextprotocol/sdk/client";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory";
-import { createTransportPair } from "@opentiny/next";
 import {
-  McpServer,
-  type RegisteredTool,
-} from "@modelcontextprotocol/sdk/server/mcp";
+  createStreamProxy,
+  MessageChannelServerTransport,
+} from "@opentiny/next";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 
 /** 快速创建一个基于内存连接的MCPServer和MCPClient pair */
 export async function createMcpServerClientPair() {
@@ -32,39 +32,66 @@ export async function createMcpServerClientPair() {
   return { server, client };
 }
 
-const registeredTools: RegisteredTool[] = [];
+/** 使用 next提供的： MessageChannelServerTransport  构建mcpServer,再反向代理页面的工具 */
+export async function createChannelServer(endpoint: string) {
+  const server = new McpServer(
+    { name: "web-mcp-server", version: "1.0.0" },
+    { capabilities: { tools: { listChanged: true } } },
+  );
+  const transport = new MessageChannelServerTransport(endpoint);
+  await server.connect(transport);
+  return { server };
+}
 
-function refreshTools(server: McpServer) {
-  // 先取消注册所有工具
-  registeredTools.forEach((tool) => {
-    tool.remove();
-  });
-
+function _refreshTools(server: McpServer) {
   const client = navigator.modelContextTesting!;
 
-  client.listTools().forEach((tool) => {
-    const registeredTool = server.registerTool(
-      tool.name,
-      {
-        description: tool.description,
-        inputSchema: tool.inputSchema as any,
-      },
-      async (...args) => {
-        return client.executeTool(tool.name, ...args);
-      },
-    );
-    // 收藏起来，方便后续取消注册
-    registeredTools.push(registeredTool);
+  const registeredTools = client.listTools().map((tool) => {
+    return {
+      name: tool.name,
+      description: tool.description,
+      inputSchema: JSON.parse(tool.inputSchema as string) as any,
+    };
   });
+
+  // 注册全部工具
+  server.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: registeredTools,
+  }));
+  // 工具的调用
+  server.server.setRequestHandler(
+    CallToolRequestSchema,
+    async (request: any) => {
+      return client.executeTool(
+        request.params.name as string,
+        JSON.stringify(request.params.arguments as any),
+      );
+    },
+  );
 }
 /** 将当前页面的 McpServer 工具代理到 modelContextTesting 上
  *  这样当 McpClient 要执行工具时，实际转发给 modelContextTesting 去执行。
  */
 export function proxyMcpServer(server: McpServer) {
-  refreshTools(server);
+  _refreshTools(server);
 
-  const client = navigator.modelContextTesting!;
-  client.registerToolsChangedCallback(() => {
-    refreshTools(server);
+  navigator.modelContextTesting!.registerToolsChangedCallback(() => {
+    _refreshTools(server);
   });
+}
+
+export async function connectWebAgent(
+  client: Client,
+  url: string,
+  staticSessionId?: string,
+) {
+  const { transport, sessionId } = await createStreamProxy({
+    client,
+    url,
+    sessionId: staticSessionId,
+  });
+
+  return {
+    sessionId,
+  };
 }
