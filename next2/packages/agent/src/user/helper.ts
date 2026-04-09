@@ -5,6 +5,10 @@ import {
   MessageChannelServerTransport,
 } from "@opentiny/next";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types";
 
 /** 快速创建一个基于内存连接的MCPServer和MCPClient pair */
 export async function createMcpServerClientPair() {
@@ -39,6 +43,9 @@ export async function createChannelServer(endpoint: string) {
     { capabilities: { tools: { listChanged: true } } },
   );
   const transport = new MessageChannelServerTransport(endpoint);
+  transport.onerror = (error) => {
+    console.error("iframe 的 MessageChannelServer Transport has error", error);
+  };
   await server.connect(transport);
   return { server };
 }
@@ -80,6 +87,7 @@ export function proxyMcpServer(server: McpServer) {
   });
 }
 
+/** 连接远端 webAgent后端，生成 sessionId 用于后续的通讯*/
 export async function connectWebAgent(
   client: Client,
   url: string,

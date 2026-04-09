@@ -37,9 +37,8 @@ export const getAISDKTools = async (client: Client): Promise<ToolSet> => {
         },
       });
     }
-
-    return tools;
   } catch (error) {
-    throw error;
+    console.error("getAISDKTools error", error);
   }
+  return tools;
 };

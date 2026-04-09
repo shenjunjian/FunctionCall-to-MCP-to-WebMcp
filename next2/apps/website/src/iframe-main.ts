@@ -15,7 +15,7 @@ console.log("iframe 页面agent", agent);
 window._agent = agent;
 
 // agent.$mcpServers.mcpServers.value.push({ type: "iframe", name: "xxxx 系统" });
-agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
+await agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
 
 // _agent.chatStream({
 //   role: "user",

@@ -1,5 +1,4 @@
-import { DelayedPromise } from "@ai-sdk/provider-utils";
-import { jsonSchema, tool, type ToolSet } from "ai";
+import { type ToolSet } from "ai";
 
 import { MessageChannelClientTransport } from "@opentiny/next";
 import { Client } from "@modelcontextprotocol/sdk/client";
@@ -18,8 +17,24 @@ export async function buildIFrameTools() {
   return getAISDKTools(client);
 }
 
-export function initIframeChannel(endpoint: string) {
-  client = new Client({ name: "web-mcp-client", version: "1.0.0" });
-  client.connect(new MessageChannelClientTransport(endpoint, window.parent));
-  return client;
+export async function initIframeChannel(endpoint: string) {
+  try {
+    client = new Client({ name: "web-mcp-client", version: "1.0.0" });
+    const transport = new MessageChannelClientTransport(
+      endpoint,
+      window.parent,
+    );
+    await client.connect(transport);
+  } catch (error) {
+    console.error("initIframeChannel error", error);
+  }
+}
+
+export async function closeIframeChannel() {
+  try {
+    await client?.close();
+  } catch (error) {
+    console.error("closeIframeChannel error", error);
+  }
+  client = null;
 }

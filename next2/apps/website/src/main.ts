@@ -44,7 +44,7 @@ navigator.modelContext.registerTool({
     };
   },
 });
-agent.$mcpServers.mcpServers.value.push({ type: "page", name: "xxxx 系统" });
+await agent.$mcpServers.addMcpServer({ type: "page", name: "xxxx 系统" });
 
 // _agent.chatStream({
 //   role: "user",

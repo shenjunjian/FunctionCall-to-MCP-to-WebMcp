@@ -3,7 +3,11 @@ import type { NextMcpServer } from "../servers/servers";
 import type { NextAgent } from "../agent";
 import type { ToolSet } from "ai";
 import { buildPageTools } from "../servers/pageServer";
-import { buildIFrameTools, initIframeChannel } from "../servers/iframeServer";
+import {
+  buildIFrameTools,
+  closeIframeChannel,
+  initIframeChannel,
+} from "../servers/iframeServer";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: NextAgent) {
   /** 所有MCP服务， 尽量不要直接操作mcpServers, 而是调用 addMcpServer(server)*/
@@ -20,11 +24,11 @@ export function useMcpServers(agent: NextAgent) {
     mcpServers.value.push(server);
 
     if (server.type === "iframe") {
-      initIframeChannel(server.endpoint || "endpoint");
+      await initIframeChannel(server.endpoint || "endpoint");
     }
   }
   /** 添加MCP服务 */
-  function removeMcpServer(serverOrId: NextMcpServer | string) {
+  async function removeMcpServer(serverOrId: NextMcpServer | string) {
     const server =
       typeof serverOrId === "string"
         ? mcpServers.value.find((s) => s.id === serverOrId)
@@ -32,6 +36,10 @@ export function useMcpServers(agent: NextAgent) {
     if (!server) return;
 
     mcpServers.value = mcpServers.value.filter((s) => s !== server);
+
+    if (server.type === "iframe") {
+      await closeIframeChannel();
+    }
   }
   /** 获取MCP服务的工具 */
   async function getToolsFromServer(server: NextMcpServer) {
