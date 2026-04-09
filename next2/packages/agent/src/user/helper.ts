@@ -43,9 +43,7 @@ export async function createChannelServer(endpoint: string) {
     { capabilities: { tools: { listChanged: true } } },
   );
   const transport = new MessageChannelServerTransport(endpoint);
-  transport.onerror = (error) => {
-    console.error("iframe 的 MessageChannelServer Transport has error", error);
-  };
+
   await transport.listen();
   await server.connect(transport);
   return { server };
