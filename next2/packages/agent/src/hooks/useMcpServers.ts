@@ -20,6 +20,15 @@ export function useMcpServers(agent: NextAgent) {
 
   /** 添加MCP服务 */
   async function addMcpServer(server: NextMcpServer) {
+    if (
+      (server.type === "iframe" &&
+        mcpServers.value.find((s) => s.type === "iframe")) ||
+      (server.type === "page" &&
+        mcpServers.value.find((s) => s.type === "page"))
+    ) {
+      console.warn(`MCP服务 ${server.type} 已存在， 请重复添加`);
+      return;
+    }
     server.id = `${server.type}-${_guid++}`;
     mcpServers.value.push(server);
 
