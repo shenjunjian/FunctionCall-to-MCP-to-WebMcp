@@ -71,16 +71,31 @@ function _refreshTools(server: McpServer) {
   server.server.setRequestHandler(
     CallToolRequestSchema,
     async (request: any) => {
-      const realToolResult = await client.executeTool(
-        request.params.name as string,
-        JSON.stringify(request.params.arguments as any),
-      );
-      console.log(
-        "转发至 真实调用 tools的地方 ",
-        request,
-        JSON.stringify(realToolResult),
-      );
-      return realToolResult;
+      try {
+        // 这里依赖前端modelContext的tools返回值，必须符合mcp标准.
+        // TODO: 如果返回字符串或对象， 需要转换格式
+        const realToolResult = await client.executeTool(
+          request.params.name as string,
+          JSON.stringify(request.params.arguments as any),
+        );
+        console.log(
+          "转发至 真实调用 tools的地方 ",
+          request,
+          realToolResult,
+          typeof realToolResult,
+        );
+        return realToolResult
+          ? JSON.parse(realToolResult)
+          : { content: [{ type: "text", text: "" }] };
+      } catch (error) {
+        console.error("modelContextTesting.executeTool error", error);
+        return {
+          content: [
+            { type: "text", text: error.message || "执行工具失败" },
+          ] as any,
+          isError: true,
+        };
+      }
     },
   );
 }

@@ -9,24 +9,26 @@ export async function buildRemoteTools(
   server: StreamableHttpServer | SSEServer | IframeServer,
 ) {
   try {
-    const client = new Client({ name: "web-mcp-client", version: "1.0.0" });
-    let transport;
-    if (server.type === "streamable-http") {
-      transport = new StreamableHTTPClientTransport(new URL(server.url!));
-    } else if (server.type === "sse") {
-      transport = new SSEClientTransport(new URL(server.url!));
-    } else if (server.type === "iframe") {
-      transport = new MessageChannelClientTransport(
-        server.endpoint || "endpoint",
-        window.parent,
-      );
+    if (!server.client) {
+      const client = new Client({ name: "web-mcp-client", version: "1.0.0" });
+      let transport;
+      if (server.type === "streamable-http") {
+        transport = new StreamableHTTPClientTransport(new URL(server.url!));
+      } else if (server.type === "sse") {
+        transport = new SSEClientTransport(new URL(server.url!));
+      } else if (server.type === "iframe") {
+        transport = new MessageChannelClientTransport(
+          server.endpoint || "endpoint",
+          window.parent,
+        );
+      }
+
+      await client.connect(transport!);
+      server.client = client;
     }
 
-    await client.connect(transport!);
-
-    const aiSdkTools = await getAISDKTools(client);
+    const aiSdkTools = await getAISDKTools(server.client!);
     server.tools = aiSdkTools;
-    client.close();
 
     return aiSdkTools;
   } catch (error) {

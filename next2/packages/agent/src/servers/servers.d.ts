@@ -1,8 +1,12 @@
+import type { Client } from "@modelcontextprotocol/sdk/client";
+import type { ToolSet } from "ai";
 interface BaseServer {
   /** 服务id */
   id?: string;
   /** 服务名称 */
   name: string;
+
+  client?: Client;
   /** 动态更新的服务工具集 */
   tools?: ToolSet;
 }
