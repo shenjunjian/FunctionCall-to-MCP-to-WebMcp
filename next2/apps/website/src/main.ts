@@ -6,7 +6,7 @@ import { createDeepSeek } from "@ai-sdk/deepseek";
 await registerOnPage({
   name: "xxxx 系统",
   iframeAble: true,
-  webAgentAble: true,
+  webAgentAble: false,
   url: "http://localhost:3000/api/v1/webmcp/mcp",
   sessionId: "sk-next2-demo",
 });
@@ -39,6 +39,38 @@ navigator.modelContext.registerTool({
         {
           type: "text",
           text: `当前红色, from buildin-modelcontext`,
+        },
+      ],
+    };
+  },
+});
+
+navigator.modelContext.registerTool({
+  name: "get-random",
+  description: "获取随机信息",
+  inputSchema: {
+    type: "object",
+    properties: {
+      count: {
+        type: "integer",
+        description: "需要的随机数的个数，范围从1到5, 最多返回5个随机数",
+      },
+    },
+  },
+  async execute(params) {
+    const { count } = params as any;
+    if (count < 1 || count > 5) {
+      throw new Error("count must be between 1 and 5");
+    }
+    const randomNumbers = Array.from({ length: count }, (_, i) =>
+      Math.floor(Math.random() * 100),
+    );
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `${JSON.stringify(randomNumbers)}`,
         },
       ],
     };

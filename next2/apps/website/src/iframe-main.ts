@@ -18,12 +18,12 @@ window._agent = agent;
 
 // agent.$mcpServers.mcpServers.value.push({ type: "iframe", name: "xxxx 系统" });
 setTimeout(() => {
-  agent.$mcpServers.addMcpServer({
-    type: "streamable-http",
-    url: "http://localhost:3000/api/v1/webmcp/mcp?sessionId=sk-next2-demo",
-    name: "xxxx 系统",
-  });
-  // agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
+  // agent.$mcpServers.addMcpServer({
+  //   type: "streamable-http",
+  //   url: "http://localhost:3000/api/v1/webmcp/mcp?sessionId=sk-next2-demo",
+  //   name: "xxxx 系统",
+  // });
+  agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
 }, 2000);
 
 // _agent.chatStream({
