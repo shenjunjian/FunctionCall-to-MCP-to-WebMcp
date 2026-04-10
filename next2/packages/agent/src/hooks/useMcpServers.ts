@@ -42,7 +42,6 @@ export function useMcpServers(agent: NextAgent) {
   async function getToolsFromServer(server: NextMcpServer) {
     if (server.type === "page") {
       return buildPageTools(server);
-);
     } else if (
       server.type === "iframe" ||
       server.type === "streamable-http" ||
