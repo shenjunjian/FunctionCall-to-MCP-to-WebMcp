@@ -3,6 +3,8 @@ interface BaseServer {
   id?: string;
   /** 服务名称 */
   name: string;
+  /** 动态更新的服务工具集 */
+  tools?: ToolSet;
 }
 
 /** 同页面服务, 每个Agent中只能有一个。 */

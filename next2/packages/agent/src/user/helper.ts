@@ -44,7 +44,10 @@ export async function createChannelServer(endpoint: string) {
   );
   const transport = new MessageChannelServerTransport(endpoint);
 
-  await transport.listen();
+  /**
+   * 1. listen很重要，缺失则无法连接。
+   * 2. 它是异步的，但此处不添加 await 目的是，它会阻塞后面的加载。 iframe 侧不连接，整个前端就阻塞不执行了 */
+  transport.listen();
   await server.connect(transport);
   return { server };
 }
@@ -68,10 +71,16 @@ function _refreshTools(server: McpServer) {
   server.server.setRequestHandler(
     CallToolRequestSchema,
     async (request: any) => {
-      return client.executeTool(
+      const realToolResult = await client.executeTool(
         request.params.name as string,
         JSON.stringify(request.params.arguments as any),
       );
+      console.log(
+        "转发至 真实调用 tools的地方 ",
+        request,
+        JSON.stringify(realToolResult),
+      );
+      return realToolResult;
     },
   );
 }

@@ -5,7 +5,7 @@ import { NextAgent } from "agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 await registerOnPage({
   name: "xxxx 系统",
-  iframeAble: false,
+  iframeAble: true,
   webAgentAble: true,
   url: "http://localhost:3000/api/v1/webmcp/mcp",
   sessionId: "sk-next2-demo",
@@ -23,11 +23,6 @@ const agent = new NextAgent({
   model: deepseek("google/gemma-4-26b-a4b"),
   // model: deepseek("deepseek-chat"),
 });
-
-// await agent.chatStream({
-//   role: "user",
-//   content: "李白",
-// });
 
 console.log("主页面agent", agent);
 

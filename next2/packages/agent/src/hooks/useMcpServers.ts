@@ -3,11 +3,7 @@ import type { NextMcpServer } from "../servers/servers";
 import type { NextAgent } from "../agent";
 import type { ToolSet } from "ai";
 import { buildPageTools } from "../servers/pageServer";
-import {
-  buildRemoteTools,
-  closeRemoteClient,
-  initRemoteClient,
-} from "../servers/remoteServer";
+import { buildRemoteTools } from "../servers/remoteServer";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: NextAgent) {
   /** 所有MCP服务， 尽量不要直接操作mcpServers, 而是调用 addMcpServer(server)*/
@@ -31,14 +27,6 @@ export function useMcpServers(agent: NextAgent) {
     }
     server.id = `${server.type}-${_guid++}`;
     mcpServers.value.push(server);
-
-    if (
-      server.type === "iframe" ||
-      server.type === "streamable-http" ||
-      server.type === "sse"
-    ) {
-      await initRemoteClient(server);
-    }
   }
   /** 添加MCP服务 */
   async function removeMcpServer(serverOrId: NextMcpServer | string) {
@@ -49,25 +37,18 @@ export function useMcpServers(agent: NextAgent) {
     if (!server) return;
 
     mcpServers.value = mcpServers.value.filter((s) => s !== server);
-
-    if (
-      server.type === "iframe" ||
-      server.type === "streamable-http" ||
-      server.type === "sse"
-    ) {
-      await closeRemoteClient();
-    }
   }
   /** 获取MCP服务的工具 */
   async function getToolsFromServer(server: NextMcpServer) {
     if (server.type === "page") {
-      return buildPageTools();
+      return buildPageTools(server);
+);
     } else if (
       server.type === "iframe" ||
       server.type === "streamable-http" ||
       server.type === "sse"
     ) {
-      return await buildRemoteTools();
+      return await buildRemoteTools(server);
     }
 
     // 不匹配则返回空对象
