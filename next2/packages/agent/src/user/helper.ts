@@ -7,6 +7,7 @@ import {
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import {
   CallToolRequestSchema,
+  CallToolResultSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types";
 
@@ -72,21 +73,35 @@ function _refreshTools(server: McpServer) {
     CallToolRequestSchema,
     async (request: any) => {
       try {
-        // 这里依赖前端modelContext的tools返回值，必须符合mcp标准.
-        // TODO: 如果返回字符串或对象， 需要转换格式
-        const realToolResult = await client.executeTool(
+        // 参考 modelContext注册工具的例子，工具返回可能有：
+        // 1. 普通字符串  eg. "hello world"
+        // 2. 普通对象  eg. { name: "张三", age: 18 }
+        // 3. mcp标准的对象  eg. { content: [{ type: "text", text: "this is result" }] }
+        // 但前端modelContext的tools返回值,永远是字符串格式。需要转换为mcp标准的对象.
+
+        const strToolResult = await client.executeTool(
           request.params.name as string,
           JSON.stringify(request.params.arguments as any),
         );
-        console.log(
-          "转发至 真实调用 tools的地方 ",
-          request,
-          realToolResult,
-          typeof realToolResult,
-        );
-        return realToolResult
-          ? JSON.parse(realToolResult)
-          : { content: [{ type: "text", text: "" }] };
+        if (!strToolResult) {
+          throw new Error("用户的工具函数返回空字符串");
+        }
+
+        let toolResult: any;
+        // 1. 判断用户tool是否返回了普通字符串
+        try {
+          // 符合3. mcp标准的对象
+          toolResult = JSON.parse(strToolResult);
+          if (!CallToolResultSchema.parse(toolResult)) {
+            // 符合2. 普通对象
+            toolResult = { content: [{ type: "text", text: strToolResult }] };
+          }
+        } catch (error) {
+          // 符合1. 普通字符串
+          toolResult = { content: [{ type: "text", text: strToolResult }] };
+        }
+
+        return toolResult;
       } catch (error) {
         console.error("modelContextTesting.executeTool error", error);
         return {

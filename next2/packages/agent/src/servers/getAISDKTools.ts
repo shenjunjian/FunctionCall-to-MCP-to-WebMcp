@@ -1,4 +1,5 @@
 import type { Client } from "@modelcontextprotocol/sdk/client";
+import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types";
 import {
   dynamicTool,
   jsonSchema,
@@ -32,6 +33,7 @@ export const getAISDKTools = async (client: Client): Promise<ToolSet> => {
         ): Promise<any> => {
           return client.callTool(
             { name, arguments: args },
+            CallToolResultSchema,
             { signal: options?.abortSignal },
           );
         },
