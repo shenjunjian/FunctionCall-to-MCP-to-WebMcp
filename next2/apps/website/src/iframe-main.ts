@@ -3,13 +3,13 @@ import { createDeepSeek } from "@ai-sdk/deepseek";
 
 const deepseek = createDeepSeek({
   apiKey: "sk-b462f8de7b364629b3136312c106655a",
-  baseURL: "https://api.deepseek.com",
-  // baseURL: "http://localhost:1234/v1",
+  // baseURL: "https://api.deepseek.com",
+  baseURL: "http://localhost:1234/v1",
 });
 
 const agent = new NextAgent({
-  // model: deepseek("google/gemma-4-26b-a4b"),
-  model: deepseek("deepseek-chat"),
+  model: deepseek("google/gemma-4-26b-a4b"),
+  // model: deepseek("deepseek-chat"),
 });
 
 console.log("iframe 页面agent", agent);
