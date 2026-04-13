@@ -1,4 +1,3 @@
-import type { Client } from "@modelcontextprotocol/sdk/client";
 import type { ToolSet } from "ai";
 interface BaseServer {
   /** 服务id */
@@ -6,7 +5,7 @@ interface BaseServer {
   /** 服务名称 */
   name: string;
 
-  client?: Client;
+  client?: any;
   /** 动态更新的服务工具集 */
   tools?: ToolSet;
 }
@@ -14,12 +13,12 @@ interface BaseServer {
 /** 同页面服务, 每个Agent中只能有一个。 */
 export interface PageServer extends BaseServer {
   type: "page";
+  endpoint?: string;
 }
 
 /** iframe 服务, 每个Agent中只能有一个。 */
 export interface IframeServer extends BaseServer {
   type: "iframe";
-  /** iframe连接时，约定的endpoint 名称, 默认值为 "endpoint" */
   endpoint?: string;
 }
 
@@ -38,6 +37,7 @@ export interface SSEServer extends BaseServer {
   /** 请求头 */
   headers?: Record<string, string>;
 }
+export type RemoteServer = IframeServer | StreamableHttpServer | SSEServer;
 
 export type NextMcpServer =
   | PageServer

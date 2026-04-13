@@ -25,11 +25,7 @@ export async function createMcpServerClientPair() {
 
   const client = new Client(
     { name: "web-mcp-client", version: "1.0.0" },
-    {
-      capabilities: {
-        roots: { listChanged: true },
-      },
-    },
+    { capabilities: { roots: { listChanged: true } } },
   );
 
   await client.connect(clientTransport);
@@ -122,6 +118,8 @@ export function proxyMcpServer(server: McpServer) {
 
   navigator.modelContextTesting!.registerToolsChangedCallback(() => {
     _refreshTools(server);
+    server.sendToolListChanged();
+    console.log("发送消息:页面工具变化了");
   });
 }
 

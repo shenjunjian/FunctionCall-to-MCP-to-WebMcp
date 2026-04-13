@@ -5,6 +5,7 @@ import {
   connectWebAgent,
   proxyMcpServer,
 } from "./helper";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 
 export interface RegisterOnPageOption {
   /** 系统名称，会显示在插件系统中。 eg. xx 智能化页面 */
@@ -60,14 +61,6 @@ export async function registerOnPage(option: RegisterOnPageOption) {
   window.addEventListener("message", (event) => {
     if (event.data.type === "getRegisterOnPageOption") {
       event.source?.postMessage(option);
-    }
-  });
-
-  window.addEventListener("message", (event) => {
-    if (event.data.type === "listenToolsChanged") {
-      navigator.modelContextTesting!.registerToolsChangedCallback(() => {
-        event.source?.postMessage({ type: "toolsChanged" });
-      });
     }
   });
 }

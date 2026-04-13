@@ -5,7 +5,6 @@ import { NextAgent } from "agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 await registerOnPage({
   name: "xxxx 系统",
-  iframeAble: true,
   webAgentAble: false,
   url: "http://localhost:3000/api/v1/webmcp/mcp",
   sessionId: "sk-next2-demo",
@@ -27,7 +26,6 @@ const agent = new NextAgent({
 console.log("主页面agent", agent);
 
 window._agent = agent;
-// _agent.$mcpServers.mcpServers.value.push({type:'page', name:'xxxx 系统' })
 
 navigator.modelContext.registerTool({
   name: "get-color",
@@ -45,37 +43,37 @@ navigator.modelContext.registerTool({
   },
 });
 
-navigator.modelContext.registerTool({
-  name: "get-random",
-  description: "获取随机信息",
-  inputSchema: {
-    type: "object",
-    properties: {
-      count: {
-        type: "integer",
-        description: "需要的随机数的个数，范围从1到5, 最多返回5个随机数",
-      },
-    },
-  },
-  async execute(params) {
-    const { count } = params as any;
-    if (count < 1 || count > 5) {
-      throw new Error("count must be between 1 and 5");
-    }
-    const randomNumbers = Array.from({ length: count }, (_, i) =>
-      Math.floor(Math.random() * 100),
-    );
+// navigator.modelContext.registerTool({
+//   name: "get-random",
+//   description: "获取随机信息",
+//   inputSchema: {
+//     type: "object",
+//     properties: {
+//       count: {
+//         type: "integer",
+//         description: "需要的随机数的个数，范围从1到5, 最多返回5个随机数",
+//       },
+//     },
+//   },
+//   async execute(params) {
+//     const { count } = params as any;
+//     if (count < 1 || count > 5) {
+//       throw new Error("count must be between 1 and 5");
+//     }
+//     const randomNumbers = Array.from({ length: count }, (_, i) =>
+//       Math.floor(Math.random() * 100),
+//     );
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: `${JSON.stringify(randomNumbers)}`,
-        },
-      ],
-    };
-  },
-});
+//     return {
+//       content: [
+//         {
+//           type: "text",
+//           text: `${JSON.stringify(randomNumbers)}`,
+//         },
+//       ],
+//     };
+//   },
+// });
 await agent.$mcpServers.addMcpServer({ type: "page", name: "xxxx 系统" });
 
 // _agent.chatStream({

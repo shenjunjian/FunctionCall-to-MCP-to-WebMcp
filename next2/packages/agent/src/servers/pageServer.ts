@@ -4,7 +4,19 @@ import type { PageServer } from "./servers";
 /** 构建本window页面的工具集 */
 export function buildPageTools(server: PageServer) {
   try {
-    const client = navigator.modelContextTesting!;
+    if (!server.client) {
+      // 1. 缓存 client
+      server.client = navigator.modelContextTesting!;
+
+      // 2. 监听工具变化
+      server.client.registerToolsChangedCallback(async () => {
+        console.log("page 的client监听到了工具变化");
+        buildPageTools(server);
+      });
+    }
+
+    // 3. 获取工具集
+    const client = server.client!;
     const tools: ToolSet = {};
     client.listTools().forEach((currTool) => {
       tools[currTool.name] = tool({
@@ -17,7 +29,6 @@ export function buildPageTools(server: PageServer) {
       });
     });
     server.tools = tools;
-    return tools;
   } catch (error) {
     console.error("buildPageTools error", error);
   }

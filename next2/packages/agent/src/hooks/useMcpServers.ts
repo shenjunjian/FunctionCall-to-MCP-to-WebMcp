@@ -1,9 +1,13 @@
 import { ref } from "vue";
-import type { NextMcpServer } from "../servers/servers";
+import type { NextMcpServer, RemoteServer } from "../servers/servers";
 import type { NextAgent } from "../next-agent";
 import type { ToolSet } from "ai";
+import {
+  beforeRemoveServer,
+  buildRemoteTools,
+  isRemoteServer,
+} from "../servers/remoteServer";
 import { buildPageTools } from "../servers/pageServer";
-import { buildRemoteTools } from "../servers/remoteServer";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: NextAgent) {
   /** 所有MCP服务， 尽量不要直接操作mcpServers, 而是调用 addMcpServer(server)*/
@@ -26,31 +30,31 @@ export function useMcpServers(agent: NextAgent) {
     }
     server.id = `${server.type}-${_guid++}`;
     mcpServers.value.push(server);
+    // 添加后就立即刷新工具
+    await getToolsFromServer(server);
   }
   /** 添加MCP服务 */
   async function removeMcpServer(serverOrId: NextMcpServer | string) {
-    const server =
+    const server: NextMcpServer | undefined =
       typeof serverOrId === "string"
         ? mcpServers.value.find((s) => s.id === serverOrId)
         : serverOrId;
     if (!server) return;
+
+    if (isRemoteServer(server)) {
+      await beforeRemoveServer(server as RemoteServer);
+    }
 
     mcpServers.value = mcpServers.value.filter((s) => s !== server);
   }
   /** 获取MCP服务的工具 */
   async function getToolsFromServer(server: NextMcpServer) {
     if (server.type === "page") {
-      return buildPageTools(server);
-    } else if (
-      server.type === "iframe" ||
-      server.type === "streamable-http" ||
-      server.type === "sse"
-    ) {
-      return await buildRemoteTools(server);
+      buildPageTools(server);
     }
-
-    // 不匹配则返回空对象
-    return {};
+    if (isRemoteServer(server)) {
+      await buildRemoteTools(server as RemoteServer);
+    }
   }
 
   // 每次对话前，重新刷新所有工具
@@ -63,7 +67,8 @@ export function useMcpServers(agent: NextAgent) {
     Object.assign(tools, agent.settings.tools || {});
     // 合并 mcpServers 中的工具
     for (const server of mcpServers.value) {
-      Object.assign(tools, await getToolsFromServer(server));
+      await getToolsFromServer(server);
+      Object.assign(tools, server.tools || {});
     }
     // 移除忽略的工具
     ignoreToolNames.value.forEach((name) => {
