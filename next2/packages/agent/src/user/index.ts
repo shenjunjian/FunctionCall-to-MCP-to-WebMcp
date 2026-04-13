@@ -15,7 +15,10 @@ export interface RegisterOnPageOption {
   endpoint?: string;
   /** 是否支持 web-agent 连接，默认支持 web-agent 连接 */
   webAgentAble?: boolean;
-  /** 远程遥控的页面url eg. https://agent.opentiny.design/api/v1/webmcp-trial/mcp */
+  /** webAgent的服务端url。
+   * eg. 在线试用url: https://agent.opentiny.design/api/v1/webmcp-trial/mcp
+   *  或本地启动url： http://localhost:3000/api/v1/webmcp/mcp
+   * */
   url?: string;
   /** 远程遥控的会话id,可选。 填写后，将固定sessionId */
   sessionId?: string;

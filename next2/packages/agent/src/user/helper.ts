@@ -11,7 +11,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types";
 
-/** 快速创建一个基于内存连接的MCPServer和MCPClient pair */
+/** webAgentAble时，快速创建一个基于内存连接的MCPServer和MCPClient pair */
 export async function createMcpServerClientPair() {
   // createTransportPair();  备用方案，
   const [clientTransport, serverTransport] =
@@ -37,7 +37,7 @@ export async function createMcpServerClientPair() {
   return { server, client };
 }
 
-/** 使用 next提供的： MessageChannelServerTransport  构建mcpServer,再反向代理页面的工具 */
+/** iframeAble 时，页面侧的server */
 export async function createChannelServer(endpoint: string) {
   const server = new McpServer(
     { name: "web-mcp-server", version: "1.0.0" },
@@ -47,7 +47,7 @@ export async function createChannelServer(endpoint: string) {
 
   /**
    * 1. listen很重要，缺失则无法连接。
-   * 2. 它是异步的，但此处不添加 await 目的是，它会阻塞后面的加载。 iframe 侧不连接，整个前端就阻塞不执行了 */
+   * 2. 它是异步的，但此处不添加 await 目的是，它会阻塞后面的加载。 如果 iframe 侧不连接，整个前端就阻塞不执行了 */
   transport.listen();
   await server.connect(transport);
   return { server };
