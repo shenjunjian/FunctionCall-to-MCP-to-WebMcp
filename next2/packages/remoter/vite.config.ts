@@ -15,7 +15,9 @@ export default defineConfig({
       typeCheck: true,
     },
   },
-  fmt: {},
+  fmt: {
+    printWidth: 160,
+  },
   staged: {
     "*": "vp check --fix",
   },

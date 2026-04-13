@@ -1,8 +1,10 @@
 {
-  "name": "remoter",
+  "name": "next-remoter",
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "scripts": {
     "dev": "vp dev",
     "build": "tsc && vp build",
@@ -12,11 +14,12 @@
     "@opentiny/tiny-robot": "^0.4.1",
     "@opentiny/tiny-robot-kit": "^0.4.1",
     "@opentiny/tiny-robot-svgs": "^0.4.1",
+    "next-agent": "workspace:*",
     "vue": "^3.5.30"
   },
   "devDependencies": {
-    "@vue/tsconfig": "^0.9.1",
     "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/tsconfig": "^0.9.1",
     "typescript": "~5.9.3",
     "vite": "catalog:",
     "vite-plus": "catalog:"

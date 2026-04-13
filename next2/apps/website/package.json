@@ -9,13 +9,14 @@
     "preview": "vp preview"
   },
   "dependencies": {
-    "agent": "workspace:*",
-    "zod": "^3.25.76",
-    "ai": "^6.0.146",
+    "@ai-sdk/deepseek": "^2.0.27",
+    "@ai-sdk/openai": "^3.0.50",
     "@ai-sdk/provider": "^3.0.8",
     "@ai-sdk/provider-utils": "^4.0.22",
-    "@ai-sdk/openai": "^3.0.50",
-    "@ai-sdk/deepseek": "^2.0.27"
+    "ai": "^6.0.146",
+    "next-agent": "workspace:*",
+    "next-remoter": "workspace:*",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "typescript": "~5.9.3",

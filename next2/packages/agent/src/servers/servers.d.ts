@@ -39,8 +39,4 @@ export interface SSEServer extends BaseServer {
 }
 export type RemoteServer = IframeServer | StreamableHttpServer | SSEServer;
 
-export type NextMcpServer =
-  | PageServer
-  | IframeServer
-  | StreamableHttpServer
-  | SSEServer;
+export type NextMcpServer = PageServer | IframeServer | StreamableHttpServer | SSEServer;

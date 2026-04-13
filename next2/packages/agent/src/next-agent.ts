@@ -1,9 +1,4 @@
-import {
-  ToolLoopAgent,
-  type ModelMessage,
-  type ToolLoopAgentSettings,
-  type UserModelMessage,
-} from "ai";
+import { ToolLoopAgent, type ModelMessage, type ToolLoopAgentSettings, type UserModelMessage } from "ai";
 import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
@@ -111,9 +106,7 @@ export class NextAgent {
   /** 重复上次对话 */
   async reLastChat() {
     // 截断UI 消息
-    let lastUserIndex = this.uiMessages.findLastIndex(
-      (msg) => msg.role === "user",
-    );
+    let lastUserIndex = this.uiMessages.findLastIndex((msg) => msg.role === "user");
     if (lastUserIndex === -1) return;
     this.uiMessages = this.uiMessages.slice(0, lastUserIndex);
 

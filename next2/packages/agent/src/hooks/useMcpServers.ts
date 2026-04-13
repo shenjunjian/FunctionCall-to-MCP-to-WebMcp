@@ -2,11 +2,7 @@ import { ref } from "vue";
 import type { NextMcpServer, RemoteServer } from "../servers/servers";
 import type { NextAgent } from "../next-agent";
 import type { ToolSet } from "ai";
-import {
-  beforeRemoveServer,
-  buildRemoteTools,
-  isRemoteServer,
-} from "../servers/remoteServer";
+import { beforeRemoveServer, buildRemoteTools, isRemoteServer } from "../servers/remoteServer";
 import { buildPageTools } from "../servers/pageServer";
 /** 管理自定义的MCP服务 */
 export function useMcpServers(agent: NextAgent) {
@@ -21,10 +17,7 @@ export function useMcpServers(agent: NextAgent) {
   /** 添加MCP服务， iframe，page的服务只允许添加一次 */
   async function addMcpServer(server: NextMcpServer) {
     const onceServerTypes = ["iframe", "page"];
-    if (
-      onceServerTypes.includes(server.type) &&
-      mcpServers.value.find((s) => onceServerTypes.includes(s.type))
-    ) {
+    if (onceServerTypes.includes(server.type) && mcpServers.value.find((s) => onceServerTypes.includes(s.type))) {
       console.warn(`MCP服务 ${server.type} 已存在， 请重复添加`);
       return;
     }
@@ -35,10 +28,7 @@ export function useMcpServers(agent: NextAgent) {
   }
   /** 添加MCP服务 */
   async function removeMcpServer(serverOrId: NextMcpServer | string) {
-    const server: NextMcpServer | undefined =
-      typeof serverOrId === "string"
-        ? mcpServers.value.find((s) => s.id === serverOrId)
-        : serverOrId;
+    const server: NextMcpServer | undefined = typeof serverOrId === "string" ? mcpServers.value.find((s) => s.id === serverOrId) : serverOrId;
     if (!server) return;
 
     if (isRemoteServer(server)) {

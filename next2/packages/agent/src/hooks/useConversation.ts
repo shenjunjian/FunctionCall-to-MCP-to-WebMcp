@@ -21,9 +21,7 @@ export function useConversation(agent: NextAgent) {
   const maxConversations = 20;
 
   // 加载历史会话 + 创建新会话
-  const conversations: Ref<Conversation[]> = ref(
-    JSON.parse(localStorage.getItem($KEY) || "[]"),
-  );
+  const conversations: Ref<Conversation[]> = ref(JSON.parse(localStorage.getItem($KEY) || "[]"));
   createConversation();
 
   /** 插入到队首，更新当前会话 */
@@ -40,12 +38,18 @@ export function useConversation(agent: NextAgent) {
   }
   /** 删除会话 */
   function deleteConversation(conversation: Conversation) {
-    conversations.value = conversations.value.filter(
-      (c) => c.id !== conversation.id,
-    );
+    conversations.value = conversations.value.filter((c) => c.id !== conversation.id);
     _save(conversations, maxConversations);
   }
 
+  /** 删除会话 */
+  function renameConversation(conversation: Conversation, newTitle: string) {
+    const con = conversations.value.find((c) => c.id !== conversation.id);
+    if (con) {
+      con.title = newTitle;
+      _save(conversations, maxConversations);
+    }
+  }
   // 注册钩子函数
   function syncMsgAndSave() {
     const current = conversations.value[0];
@@ -63,6 +67,7 @@ export function useConversation(agent: NextAgent) {
     createConversation,
     switchConversation,
     deleteConversation,
+    renameConversation,
   };
 }
 

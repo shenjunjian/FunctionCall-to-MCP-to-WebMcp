@@ -1,7 +1,6 @@
-import { registerOnPage } from "agent";
+import { registerOnPage, NextAgent } from "next-agent";
 import { z } from "zod";
 
-import { NextAgent } from "agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 await registerOnPage({
   name: "xxxx 系统",

@@ -1,10 +1,5 @@
 import { initializeWebMCPPolyfill } from "@mcp-b/webmcp-polyfill";
-import {
-  createChannelServer,
-  createMcpServerClientPair,
-  connectWebAgent,
-  proxyMcpServer,
-} from "./helper";
+import { createChannelServer, createMcpServerClientPair, connectWebAgent, proxyMcpServer } from "./helper";
 
 export interface RegisterOnPageOption {
   /** 系统名称，会显示在插件系统中。 eg. xx 智能化页面 */
@@ -36,9 +31,7 @@ export async function registerOnPage(option: RegisterOnPageOption) {
 
   if (option.iframeAble) {
     // 内部有个异步listen会阻塞，所以修改为then的写法，保证主流程是同步的
-    createChannelServer(option.endpoint || "endpoint").then(({ server }) =>
-      proxyMcpServer(server),
-    );
+    createChannelServer(option.endpoint || "endpoint").then(({ server }) => proxyMcpServer(server));
   }
 
   if (option.webAgentAble) {
@@ -49,11 +42,7 @@ export async function registerOnPage(option: RegisterOnPageOption) {
     const { server, client } = await createMcpServerClientPair();
     proxyMcpServer(server);
 
-    const { sessionId } = await connectWebAgent(
-      client,
-      option.url,
-      option.sessionId,
-    );
+    const { sessionId } = await connectWebAgent(client, option.url, option.sessionId);
 
     option.sessionId = sessionId;
   }

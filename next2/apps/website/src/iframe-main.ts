@@ -1,4 +1,4 @@
-import { NextAgent } from "agent";
+import { NextAgent } from "next-agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 
 const deepseek = createDeepSeek({

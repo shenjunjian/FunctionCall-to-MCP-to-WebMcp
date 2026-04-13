@@ -1,9 +1,4 @@
-import type {
-  FinishReason,
-  LanguageModelRequestMetadata,
-  LanguageModelUsage,
-  StreamTextResult,
-} from "ai";
+import type { FinishReason, LanguageModelRequestMetadata, LanguageModelUsage, StreamTextResult } from "ai";
 import { reactive, ref } from "vue";
 export interface StreamVisitorOption {
   debug?: boolean;
@@ -94,12 +89,7 @@ export class StreamVisitor {
       let toolContent: ToolContent;
       for await (const event of stream.fullStream) {
         if (this.option.debug) {
-          console.log(
-            "【stream-debug】 " +
-              (new Date().getTime() / 1000).toString().slice(-6) +
-              event.type,
-            event,
-          );
+          console.log("【stream-debug】 " + (new Date().getTime() / 1000).toString().slice(-6) + event.type, event);
         }
 
         switch (event.type) {

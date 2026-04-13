@@ -1,5 +1,5 @@
 {
-  "name": "agent",
+  "name": "next-agent",
   "version": "0.0.0",
   "description": "将应用智能化.",
   "homepage": "https://github.com/author/library#readme",
@@ -29,19 +29,19 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "ai": "^6.0.146",
-    "@ai-sdk/provider": "^3.0.8",
-    "@ai-sdk/provider-utils": "^4.0.22",
-    "@ai-sdk/openai": "^3.0.50",
     "@ai-sdk/deepseek": "^2.0.27",
     "@ai-sdk/mcp": "^1.0.32",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@ai-sdk/openai": "^3.0.50",
+    "@ai-sdk/provider": "^3.0.8",
+    "@ai-sdk/provider-utils": "^4.0.22",
     "@mcp-b/webmcp-polyfill": "^2.2.0",
     "@mcp-b/webmcp-types": "^2.2.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@opentiny/next": "^0.3.2",
-    "zod": "^3.25.76",
+    "ai": "^6.0.146",
+    "json-schema-to-zod": "2.8.1",
     "vue": "^3.5.0",
-    "json-schema-to-zod": "2.8.1"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

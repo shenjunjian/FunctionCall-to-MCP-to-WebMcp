@@ -1,7 +1,4 @@
-import {
-  DelayedPromise,
-  type ToolExecutionOptions,
-} from "@ai-sdk/provider-utils";
+import { DelayedPromise, type ToolExecutionOptions } from "@ai-sdk/provider-utils";
 import { jsonSchema, tool, type ToolSet } from "ai";
 
 /** iframe 侧的port */
@@ -33,38 +30,29 @@ export function initIframeChannel() {
   window.parent.postMessage({ type: "connect" }, "*", [channel.port2]);
   iframePort = channel.port1;
 
-  console.log(
-    "MessageChannel 已经创建并发送 port2 到主页面， iframe留下了 iframePort",
-    iframePort,
-  );
+  console.log("MessageChannel 已经创建并发送 port2 到主页面， iframe留下了 iframePort", iframePort);
 
   iframePort.onmessage = (event) => {
     // IFRAME-MSG-FLOW-5
     if (event.data.type === "listToolsResult") {
       const tools: ToolSet = {};
-      event.data.tools.forEach(
-        (currTool: {
-          name: string;
-          description: string;
-          inputSchema: string;
-        }) => {
-          tools[currTool.name] = tool({
-            description: currTool.description,
-            inputSchema: jsonSchema(JSON.parse(currTool.inputSchema as string)),
-            // params是入参， aiContext 包含了 {toolCallId, messages,abortSignal}
-            execute: async (params: any, aiContext: ToolExecutionOptions) => {
-              callToolPromise = new DelayedPromise<any>(); // 重置 callToolPromise
-              // 向port 发送执行请求
-              iframePort?.postMessage({
-                type: "callTool",
-                toolName: currTool.name,
-                params,
-              });
-              return callToolPromise.promise;
-            },
-          });
-        },
-      );
+      event.data.tools.forEach((currTool: { name: string; description: string; inputSchema: string }) => {
+        tools[currTool.name] = tool({
+          description: currTool.description,
+          inputSchema: jsonSchema(JSON.parse(currTool.inputSchema as string)),
+          // params是入参， aiContext 包含了 {toolCallId, messages,abortSignal}
+          execute: async (params: any, aiContext: ToolExecutionOptions) => {
+            callToolPromise = new DelayedPromise<any>(); // 重置 callToolPromise
+            // 向port 发送执行请求
+            iframePort?.postMessage({
+              type: "callTool",
+              toolName: currTool.name,
+              params,
+            });
+            return callToolPromise.promise;
+          },
+        });
+      });
 
       listToolPromise?.resolve(tools);
     }

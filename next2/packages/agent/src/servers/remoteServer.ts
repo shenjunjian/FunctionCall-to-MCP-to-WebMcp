@@ -6,8 +6,7 @@ import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { MessageChannelClientTransport } from "@opentiny/next";
 import { ToolListChangedNotificationSchema } from "@modelcontextprotocol/sdk/types";
 
-export const isRemoteServer = (server: NextMcpServer) =>
-  ["iframe", "streamable-http", "sse"].includes(server.type);
+export const isRemoteServer = (server: NextMcpServer) => ["iframe", "streamable-http", "sse"].includes(server.type);
 
 /** 构建远程服务的工具 */
 export async function buildRemoteTools(server: RemoteServer) {
@@ -21,24 +20,18 @@ export async function buildRemoteTools(server: RemoteServer) {
       } else if (server.type === "sse") {
         transport = new SSEClientTransport(new URL(server.url!));
       } else if (server.type === "iframe") {
-        transport = new MessageChannelClientTransport(
-          server.endpoint || "endpoint",
-          window.parent,
-        );
+        transport = new MessageChannelClientTransport(server.endpoint || "endpoint", window.parent);
       }
 
       await client.connect(transport!);
       server.client = client;
 
       // 2. 监听工具变化
-      client.setNotificationHandler(
-        ToolListChangedNotificationSchema,
-        async () => {
-          console.log("remoter 的client监听到了工具变化");
-          const aiSdkTools = await getAISDKTools(server.client!);
-          server.tools = aiSdkTools;
-        },
-      );
+      client.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
+        console.log("remoter 的client监听到了工具变化");
+        const aiSdkTools = await getAISDKTools(server.client!);
+        server.tools = aiSdkTools;
+      });
     }
 
     // 3. 获取工具
