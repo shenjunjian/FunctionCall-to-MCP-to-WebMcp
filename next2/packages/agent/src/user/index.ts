@@ -40,6 +40,10 @@ export async function registerOnPage(option: RegisterOnPageOption) {
   }
 
   if (option.webAgentAble) {
+    if (!option.url) {
+      throw new Error("webAgentAble is true, but url is not provided");
+    }
+
     const { server, client } = await createMcpServerClientPair();
     proxyMcpServer(server);
 
@@ -48,5 +52,14 @@ export async function registerOnPage(option: RegisterOnPageOption) {
       option.url,
       option.sessionId,
     );
+
+    option.sessionId = sessionId;
   }
+
+  // 回复消息。
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "getRegisterOnPageOption") {
+      event.source?.postMessage(option);
+    }
+  });
 }
