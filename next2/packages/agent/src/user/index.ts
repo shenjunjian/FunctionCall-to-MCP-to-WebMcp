@@ -56,10 +56,18 @@ export async function registerOnPage(option: RegisterOnPageOption) {
     option.sessionId = sessionId;
   }
 
-  // 回复消息。
+  // 回复页面注册信息
   window.addEventListener("message", (event) => {
     if (event.data.type === "getRegisterOnPageOption") {
       event.source?.postMessage(option);
+    }
+  });
+
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "listenToolsChanged") {
+      navigator.modelContextTesting!.registerToolsChangedCallback(() => {
+        event.source?.postMessage({ type: "toolsChanged" });
+      });
     }
   });
 }
