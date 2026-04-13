@@ -1,4 +1,4 @@
-import type { NextAgent } from "../agent";
+import type { NextAgent } from "../next-agent";
 
 export class PromptManager {
   /** 固定系统提示词 */

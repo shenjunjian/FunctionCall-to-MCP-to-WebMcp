@@ -1,4 +1,4 @@
-import type { NextAgent } from "../agent";
+import type { NextAgent } from "../next-agent";
 
 /** 在代理中埋点生命周期的钩子
  * 1. 对话开始

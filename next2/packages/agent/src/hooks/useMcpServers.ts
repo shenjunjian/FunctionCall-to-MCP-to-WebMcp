@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import type { NextMcpServer } from "../servers/servers";
-import type { NextAgent } from "../agent";
+import type { NextAgent } from "../next-agent";
 import type { ToolSet } from "ai";
 import { buildPageTools } from "../servers/pageServer";
 import { buildRemoteTools } from "../servers/remoteServer";
@@ -14,13 +14,12 @@ export function useMcpServers(agent: NextAgent) {
   /** 生成服务ID */
   let _guid = 0;
 
-  /** 添加MCP服务 */
+  /** 添加MCP服务， iframe，page的服务只允许添加一次 */
   async function addMcpServer(server: NextMcpServer) {
+    const onceServerTypes = ["iframe", "page"];
     if (
-      (server.type === "iframe" &&
-        mcpServers.value.find((s) => s.type === "iframe")) ||
-      (server.type === "page" &&
-        mcpServers.value.find((s) => s.type === "page"))
+      onceServerTypes.includes(server.type) &&
+      mcpServers.value.find((s) => onceServerTypes.includes(s.type))
     ) {
       console.warn(`MCP服务 ${server.type} 已存在， 请重复添加`);
       return;

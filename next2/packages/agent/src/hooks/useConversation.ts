@@ -1,5 +1,5 @@
 import type { ModelMessage, UserModelMessage } from "ai";
-import type { NextAgent, UIMessage } from "../agent";
+import type { NextAgent, UIMessage } from "../next-agent";
 import { ref, type Ref } from "vue";
 
 export type Conversation = {

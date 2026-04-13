@@ -1,4 +1,4 @@
-export { NextAgent } from "./agent.ts";
+export { NextAgent } from "./next-agent.ts";
 export { registerOnPage, type RegisterOnPageOption } from "./user/index.ts";
 
 export type {

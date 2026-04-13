@@ -11,7 +11,7 @@ import {
 /**
  * 快速从官方 mcp 或 WebMcpClient 这2种client中读取 tools 数组，并转换成 ai-sdk 的tool的对象格式。
  * @params client  一个已连接好的 WebMcpClient
- * @returns ai-sdk的dynamicTool对象。
+ * @returns 包含dynamicTool对象的对象键值对。
  */
 export const getAISDKTools = async (client: Client): Promise<ToolSet> => {
   const tools: Record<string, Tool> = {};
