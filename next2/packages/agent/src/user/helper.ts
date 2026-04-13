@@ -44,7 +44,7 @@ export async function createChannelServer(endpoint: string) {
   /**
    * 1. listen很重要，缺失则无法连接。
    * 2. 它是异步的，但此处不添加 await 目的是，它会阻塞后面的加载。 如果 iframe 侧不连接，整个前端就阻塞不执行了 */
-  transport.listen();
+  await transport.listen();
   await server.connect(transport);
   return { server };
 }

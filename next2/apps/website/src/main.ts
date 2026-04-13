@@ -5,6 +5,7 @@ import { NextAgent } from "agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 await registerOnPage({
   name: "xxxx 系统",
+  iframeAble: true,
   webAgentAble: false,
   url: "http://localhost:3000/api/v1/webmcp/mcp",
   sessionId: "sk-next2-demo",
@@ -42,6 +43,7 @@ navigator.modelContext.registerTool({
     };
   },
 });
+// await agent.$mcpServers.addMcpServer({ type: "page", name: "xxxx 系统" });
 
 // navigator.modelContext.registerTool({
 //   name: "get-random",
@@ -74,7 +76,6 @@ navigator.modelContext.registerTool({
 //     };
 //   },
 // });
-await agent.$mcpServers.addMcpServer({ type: "page", name: "xxxx 系统" });
 
 // _agent.chatStream({
 //   role: "user",

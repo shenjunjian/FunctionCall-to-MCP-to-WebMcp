@@ -1,5 +1,6 @@
 import { jsonSchema, tool, type ToolExecutionOptions, type ToolSet } from "ai";
 import type { PageServer } from "./servers";
+import type { ModelContextTesting } from "@mcp-b/webmcp-types";
 
 /** 构建本window页面的工具集 */
 export function buildPageTools(server: PageServer) {
@@ -16,7 +17,7 @@ export function buildPageTools(server: PageServer) {
     }
 
     // 3. 获取工具集
-    const client = server.client!;
+    const client: ModelContextTesting = server.client!;
     const tools: ToolSet = {};
     client.listTools().forEach((currTool) => {
       tools[currTool.name] = tool({

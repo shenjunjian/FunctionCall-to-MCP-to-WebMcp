@@ -22,7 +22,7 @@ setTimeout(() => {
   //   url: "http://localhost:3000/api/v1/webmcp/mcp?sessionId=sk-next2-demo",
   //   name: "xxxx 系统",
   // });
-  // agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
+  agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
 }, 2000);
 
 // _agent.chatStream({
