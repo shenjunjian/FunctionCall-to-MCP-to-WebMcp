@@ -1,4 +1,9 @@
-import { ToolLoopAgent, type ModelMessage, type ToolLoopAgentSettings, type UserModelMessage } from "ai";
+import {
+  ToolLoopAgent,
+  type ModelMessage,
+  type ToolLoopAgentSettings,
+  type UserModelMessage,
+} from "ai";
 import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
@@ -15,6 +20,14 @@ export type UIMessage =
       role: "assistant";
       content: Ref<StartContent | undefined>;
     };
+
+export type NextAgentStatus =
+  | "init" // 初始状态
+  | "processing" // AI请求正在处理中, 还未响应，显示加载动画
+  | "streaming" // 流式响应中分块数据返回中
+  | "error"
+  | "aborted"
+  | "finished";
 export class NextAgent {
   /** 调试流， 是否打印流数据 */
   private debugStream: boolean = false;
@@ -32,6 +45,7 @@ export class NextAgent {
   messages: ModelMessage[] = [];
   /** 用户界面渲染的消息体。 其中ai 的消息为 ref 的响应式数据， 根据流事件，进行实时更新 */
   uiMessages: UIMessage[] = [];
+  status: NextAgentStatus = "init";
 
   // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
   $lifeCycle = useLifeCycle(this);
@@ -64,6 +78,7 @@ export class NextAgent {
   }
   /** 发起对话， 参数 message 为标准的ai-sdk参数： string | Array<TextPart | ImagePart | FilePart> */
   async chatStream(message: UserModelMessage) {
+    this.status = "processing";
     this.abortController = new AbortController();
 
     this.messages.push(message);
@@ -84,15 +99,25 @@ export class NextAgent {
         const aiMessages = (await streamResult.response).messages;
         this.messages = this.messages.concat(aiMessages);
 
+        this.status =
+          startContent?.value?.finishReason === "error"
+            ? "error"
+            : startContent?.value?.finishReason === "other"
+              ? "aborted"
+              : "finished";
         await this.$lifeCycle.emit("chatEnd", aiMessages);
         dp.resolve();
       },
+      onStep: () => {
+        // 当返回 step数据时，才开始流返回
+        this.status = "streaming";
+      },
     });
     // 立即返回的一个ref数据，拼接到 **UI消息列表**
-    const aiContent = visitor.traverse(streamResult);
+    const startContent = visitor.traverse(streamResult);
     this.uiMessages.push({
       role: "assistant",
-      content: aiContent,
+      content: startContent,
     });
 
     return dp.promise;
@@ -106,7 +131,9 @@ export class NextAgent {
   /** 重复上次对话 */
   async reLastChat() {
     // 截断UI 消息
-    let lastUserIndex = this.uiMessages.findLastIndex((msg) => msg.role === "user");
+    let lastUserIndex = this.uiMessages.findLastIndex(
+      (msg) => msg.role === "user",
+    );
     if (lastUserIndex === -1) return;
     this.uiMessages = this.uiMessages.slice(0, lastUserIndex);
 
