@@ -12,6 +12,12 @@ export type Conversation = {
 };
 
 const $KEY = "next-conversation-private-key";
+
+const debugLog = false;
+const log = (...data: any) => {
+  debugLog && console.log(data);
+};
+
 /* 对话管理, 创建新会话，删除会话，记录到本地存储
   1. 加载时，创建一个新会话，压入到队列头， 但不记录到本地存储。
   2. 保存时，才检查新会话有没有消息，有消息才生成title。  无消息，证明会话一直未聊天，要移除掉它。
@@ -21,7 +27,9 @@ export function useConversation(agent: NextAgent) {
   const maxConversations = 20;
 
   // 加载历史会话 + 创建新会话
-  const conversations: Ref<Conversation[]> = ref(JSON.parse(localStorage.getItem($KEY) || "[]"));
+  const conversations: Ref<Conversation[]> = ref(
+    JSON.parse(localStorage.getItem($KEY) || "[]"),
+  );
   createConversation();
 
   /** 插入到队首，更新当前会话 */
@@ -35,20 +43,25 @@ export function useConversation(agent: NextAgent) {
     deleteConversation(conversation);
     conversations.value.unshift(conversation);
     _save(conversations, maxConversations);
+    log("switchConversation", conversation);
   }
   /** 删除会话 */
   function deleteConversation(conversation: Conversation) {
-    conversations.value = conversations.value.filter((c) => c.id !== conversation.id);
+    conversations.value = conversations.value.filter(
+      (c) => c.id !== conversation.id,
+    );
     _save(conversations, maxConversations);
+    log("deleteConversation", conversation);
   }
 
-  /** 删除会话 */
+  /** 重命名会话标题 */
   function renameConversation(conversation: Conversation, newTitle: string) {
-    const con = conversations.value.find((c) => c.id !== conversation.id);
+    const con = conversations.value.find((c) => c.id === conversation.id);
     if (con) {
       con.title = newTitle;
       _save(conversations, maxConversations);
     }
+    log("renameConversation", conversation, newTitle);
   }
   // 注册钩子函数
   function syncMsgAndSave() {
