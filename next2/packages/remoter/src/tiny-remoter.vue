@@ -1,5 +1,10 @@
 <template>
   <TrContainer v-model:show="show" v-model:fullscreen="fullscreen" :title="title">
+    <template #title>
+      <h3 class="tr-container__title">
+        <slot name="title" :title="title">{{ title }}</slot>
+      </h3>
+    </template>
     <template #operation>
       <slot name="operation">
         <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="nextAgent.$conversation.createConversation()" />
@@ -19,7 +24,7 @@
       <slot name="default">默认插槽</slot>
     </template>
     <template #footer>
-      <slot name="footer">默认footer</slot>
+      <slot name="footer"></slot>
     </template>
   </TrContainer>
 </template>
@@ -29,6 +34,8 @@ import { IconNewSession, IconHistory } from "@opentiny/tiny-robot-svgs";
 import { NextAgent } from "next-agent";
 import { ref } from "vue";
 
+// 尺寸，定位等，参考  https://opentiny.github.io/tiny-robot/latest/components/container.html#css-变量
+// 也可以直接绑定 style, 直接透传到 TrContainer 组件上。
 const props = defineProps({
   /** 左上角的标题 */
   title: {
@@ -46,4 +53,15 @@ const show = defineModel("show", { type: Boolean, default: false });
 
 const { isTouchDevice } = useTouchDevice();
 const showHistory = ref(false);
+
+const slots = defineSlots<{
+  /** 顶部标题插槽 */
+  title(props: { title: string }): any;
+  /** 顶部操作插槽 */
+  operation(props: {}): any;
+  /** 默认插槽 ---- 包含欢迎信息 或者 智能体的聊天信息 */
+  default(props: {}): any;
+  /** 底部插槽 ---- 包含输入和发送按钮等 */
+  footer(props: {}): any;
+}>();
 </script>

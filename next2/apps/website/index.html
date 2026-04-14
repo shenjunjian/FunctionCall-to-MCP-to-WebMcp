@@ -9,6 +9,17 @@
   <body>
     <div id="app">i am App page</div>
     <script type="module" src="/src/main.ts"></script>
-    <iframe src="/iframe-page.html" frameborder="3"></iframe>
+    <iframe id="iframeDom" src="/iframe-page.html" frameborder="3"></iframe>
+
+    <style>
+      #iframeDom {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 480px;
+        height: 100vh;
+      }
+    </style>
   </body>
 </html>
