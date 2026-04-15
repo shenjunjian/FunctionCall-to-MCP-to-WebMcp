@@ -1,10 +1,5 @@
 <template>
-  <TrContainer
-    v-model:show="show"
-    v-model:fullscreen="fullscreen"
-    :title="title"
-    class="tiny-remoter-wrap"
-  >
+  <TrContainer v-model:show="show" v-model:fullscreen="fullscreen" :title="title" class="tiny-remoter-wrap">
     <template #title>
       <h3 class="tr-container__title">
         <slot name="title" :title="title">{{ title }}</slot>
@@ -12,80 +7,65 @@
     </template>
     <template #operations>
       <slot name="operations">
-        <tr-icon-button
-          :icon="IconNewSession"
-          size="28"
-          svgSize="20"
-          @click="nextAgent.$conversation.createConversation()"
-        />
+        <tr-icon-button :icon="IconNewSession" size="28" svgSize="20"
+          @click="nextAgent.$conversation.createConversation()" />
         <div style="position: relative">
-          <tr-icon-button
-            :icon="IconHistory"
-            size="28"
-            svgSize="20"
-            @click="showHistory = !showHistory"
-          />
+          <tr-icon-button :icon="IconHistory" size="28" svgSize="20" @click="showHistory = !showHistory" />
           <div v-show="showHistory" class="tr-history-custom-container">
-            <div><h3 style="margin: 0; padding: 0 12px">历史对话</h3></div>
-            <tr-icon-button
-              :icon="IconClose"
-              size="28"
-              svgSize="20"
-              @click="showHistory = false"
-              style="position: absolute; right: 14px; top: 14px"
-            />
-            <tr-history
-              class="tr-history-custom"
-              :data="nextAgent.$conversation.conversations.value"
-              :show-rename-controls="isTouchDevice"
-              :selected="nextAgent.$conversation.conversations.value[0]?.id"
-              @item-click="(item) => nextAgent.$conversation.switchConversation(item)"
-              @item-title-change="
+            <div>
+              <h3 style="margin: 0; padding: 0 12px">历史对话</h3>
+            </div>
+            <tr-icon-button :icon="IconClose" size="28" svgSize="20" @click="showHistory = false"
+              style="position: absolute; right: 14px; top: 14px" />
+            <tr-history class="tr-history-custom" :data="nextAgent.$conversation.conversations.value"
+              :show-rename-controls="isTouchDevice" :selected="nextAgent.$conversation.conversations.value[0]?.id"
+              @item-click="(item) => nextAgent.$conversation.switchConversation(item)" @item-title-change="
                 (newTitle, item) => nextAgent.$conversation.renameConversation(item, newTitle)
-              "
-              @item-action="
+              " @item-action="
                 (action, item) =>
                   action.id === 'delete' && nextAgent.$conversation.deleteConversation(item)
-              "
-            />
+              " />
           </div>
         </div>
       </slot>
     </template>
     <template #default>
       <slot name="default">
-        <div>默认插槽</div>
+        <slot name="welcome">
+          <div style="flex: 1" v-if="nextAgent.uiMessages.length === 0">
+            <tr-welcome :title="title" description="我是你的私人智能助手" :icon="welcomeIcon">
+            </tr-welcome>
+          </div>
+        </slot>
+        <!-- <tr-bubble-provider v-else>
+          <tr-bubble-list style="flex: 1" :items="nextAgent.uiMessages" :roles="roles" :loading="loading"
+            loading-role="assistant" auto-scroll>
+          </tr-bubble-list>
+        </tr-bubble-provider> -->
       </slot>
     </template>
     <template #footer>
       <slot name="footer">
         <div class="tiny-remoter-chat-input" :class="{ 'max-container': fullscreen }">
           <div class="chat-input-pills">
-            <tr-dropdown-menu
-              v-for="pill in pillItems"
-              :key="pill.id"
-              :items="pill.menus"
-              @item-click="handlePillItemClick"
-              trigger="click"
-            >
+            <tr-dropdown-menu v-for="pill in pillItems" :key="pill.id" :items="pill.menus"
+              @item-click="handlePillItemClick" trigger="click">
               <template #trigger>
                 <TrSuggestionPillButton>{{ pill.text }}</TrSuggestionPillButton>
               </template>
             </tr-dropdown-menu>
           </div>
-          <tr-sender
-            ref="senderRef"
-            mode="multiple"
-            v-model="inputMessage"
-            :class="{ 'tr-sender-compact': !fullscreen }"
-            :placeholder="loading ? '正在思考中...' : '请输入您的问题'"
-            :loading="loading"
-            showWordLimit
-            :maxLength="20000"
-            :clearable="true"
-            @submit="handleSendMessage"
-            @cancel="cancelRequest"
-          ></tr-sender>
+          <tr-sender ref="senderRef" mode="multiple" v-model="inputMessage" :size="size"
+            :class="{ 'tr-sender-compact': !fullscreen }" :placeholder="loading ? '正在思考中...' : '请输入您的问题'"
+            :loading="loading" showWordLimit :maxLength="20000" :clearable="true" @submit="handleSendMessage"
+            @cancel="cancelRequest">
+            <template #footer-right>
+              <!-- 上传按钮 -->
+              <UploadButton v-bind="uploadButtonConfig" @select="handleUploadFiles" />
+              <!-- 语音输入按钮. 暂时用“混合输入”， 因为测试“连续输入”有bug   -->
+              <VoiceButton v-bind="voiceButtonConfig" />
+            </template>
+          </tr-sender>
         </div>
       </slot>
     </template>
@@ -100,12 +80,19 @@ import {
   TrSender,
   TrSuggestionPillButton,
   TrDropdownMenu,
+  UploadButton,
+  VoiceButton,
+  TrWelcome,
+  TrBubbleList,
   type StructuredData,
+  type VoiceButtonProps,
+  type UploadButtonProps,
 } from "@opentiny/tiny-robot";
 import { IconNewSession, IconHistory, IconClose } from "@opentiny/tiny-robot-svgs";
 import { NextAgent } from "next-agent";
-import { computed, ref, type PropType } from "vue";
+import { computed, h, ref, type PropType } from "vue";
 import { pillItems, type PillItem, type PillItemMenu } from "./utils/const";
+import WelcomeLogo from "./components/welcome-logo.vue";
 
 // 尺寸，定位等，参考  https://opentiny.github.io/tiny-robot/latest/components/container.html#css-变量
 // 也可以直接绑定 style, 直接透传到 TrContainer 组件上。
@@ -125,6 +112,21 @@ const props = defineProps({
     type: Array as PropType<PillItem[]>,
     default: pillItems,
   },
+  /** 语音输入按钮配置，参考 https://docs.opentiny.design/tiny-robot/components/sender.html#voicebutton */
+  voiceButtonConfig: {
+    type: Object as PropType<VoiceButtonProps>,
+    default: () => ({}),
+  },
+  /** 上传按钮配置，参考 https://docs.opentiny.design/tiny-robot/components/sender.html#uploadbutton */
+  uploadButtonConfig: {
+    type: Object as PropType<UploadButtonProps>,
+    default: () => ({}),
+  },
+  /** 聊天内容区域 和 输入框的 尺寸， small 时略为紧凑*/
+  size: {
+    type: String as PropType<"normal" | "small">,
+    default: "normal",
+  },
 });
 
 const slots = defineSlots<{
@@ -136,6 +138,8 @@ const slots = defineSlots<{
   default(props: {}): any;
   /** 底部插槽 ---- 包含输入和发送按钮等 */
   footer(props: {}): any;
+  /** 欢迎插槽 */
+  welcome(props: {}): any;
 }>();
 //********** 变量 ********
 const fullscreen = defineModel("fullscreen", { type: Boolean, default: false });
@@ -149,6 +153,8 @@ const loading = computed(() => {
     props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming"
   );
 });
+
+const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
 // ************ 方法 ************
 // 处理 pill 下拉菜单点击事件
 const handlePillItemClick = (menu: PillItemMenu) => {
@@ -164,6 +170,8 @@ const handleSendMessage = async (
 const cancelRequest = () => {
   props.nextAgent.cancelChat();
 };
+// 处理上传文件事件
+const handleUploadFiles = (files: File[]) => { };
 </script>
 
 <style>
@@ -200,6 +208,7 @@ const cancelRequest = () => {
   flex-direction: column;
   gap: 8px;
 }
+
 .tiny-remoter-chat-input .chat-input-pills {
   display: flex;
   align-items: center;
@@ -208,6 +217,7 @@ const cancelRequest = () => {
 
 .tiny-remoter-chat-input .pills {
   flex: 1;
+
   :deep(.tr-suggestion-pills__container) {
     mask: linear-gradient(to right, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
   }
