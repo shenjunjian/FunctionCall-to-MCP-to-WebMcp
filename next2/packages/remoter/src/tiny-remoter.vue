@@ -32,13 +32,14 @@
     <template #default>
       <slot name="default">
         <slot name="welcome">
-          <div style="flex: 1" v-if="nextAgent.uiMessages.length === 0">
+          <div style="flex: 1" v-if="nextAgent.uiMessages.value.length === 0">
             <tr-welcome :title="title" description="我是你的私人智能助手" :icon="welcomeIcon">
             </tr-welcome>
           </div>
         </slot>
-        <tr-bubble-provider v-if="nextAgent.uiMessages.length > 0">
-          <tr-bubble-list style="flex: 1" :messages="nextAgent.uiMessages" v-bind="bubbleListConfig">
+        <tr-bubble-provider :store="bubbleStore" :content-renderer-matches="contentRendererMatches">
+          <tr-bubble-list v-if="nextAgent.uiMessages.value.length > 0" style="flex: 1"
+            :messages="nextAgent.uiMessages.value" v-bind="bubbleListConfig">
           </tr-bubble-list>
         </tr-bubble-provider>
       </slot>
@@ -83,17 +84,28 @@ import {
   VoiceButton,
   TrWelcome,
   TrBubbleList,
+  TrBubbleProvider,
   BubbleRenderers,
   type StructuredData,
   type VoiceButtonProps,
   type UploadButtonProps,
   type BubbleListProps,
+  type BubbleContentRendererMatch,
+  BubbleRendererMatchPriority,
 } from "@opentiny/tiny-robot";
-import { IconNewSession, IconHistory, IconClose, IconAi, IconUser } from "@opentiny/tiny-robot-svgs";
+import {
+  IconNewSession,
+  IconHistory,
+  IconClose,
+  IconAi,
+  IconUser,
+} from "@opentiny/tiny-robot-svgs";
 import { NextAgent } from "next-agent";
-import { computed, h, ref, type PropType } from "vue";
+import { computed, defineCustomElement, h, markRaw, onMounted, ref, type PropType } from "vue";
 import { pillItems, type PillItem, type PillItemMenu } from "./utils/const";
 import WelcomeLogo from "./components/welcome-logo.vue";
+import SchemaCard from "./components/schema-card.ce.vue";
+import StartContentRenderer from "./components/start-content-renderer.vue";
 
 // 尺寸，定位等，参考  https://opentiny.github.io/tiny-robot/latest/components/container.html#css-变量
 // 也可以直接绑定 style, 直接透传到 TrContainer 组件上。
@@ -123,7 +135,7 @@ const props = defineProps({
     type: Object as PropType<UploadButtonProps>,
     default: () => ({}),
   },
-  /** 聊天内容区域 配置，参考 https://docs.opentiny.design/tiny-robot/components/bubble.html#props 
+  /** 聊天内容区域 配置，参考 https://docs.opentiny.design/tiny-robot/components/bubble.html#props
    * 可以设置： 分组策略、角色的头像，位置，形状、 内容渲染模式、autoScroll 等
    */
   bubbleListConfig: {
@@ -131,9 +143,17 @@ const props = defineProps({
     default: () => ({
       autoScroll: true,
       roleConfigs: {
-        user: { avatar: h(IconUser, { style: { fontSize: '32px' } }), placement: 'end', shape: 'corner' },
-        assistant: { avatar: h(IconAi, { style: { fontSize: '32px' } }), placement: 'start', shape: 'corner' },
-      }
+        user: {
+          avatar: h(IconUser, { style: { fontSize: "32px" } }),
+          placement: "end",
+          shape: "corner",
+        },
+        assistant: {
+          avatar: h(IconAi, { style: { fontSize: "32px" } }),
+          placement: "start",
+          shape: "corner",
+        },
+      },
     }),
   },
   /** 聊天内容区域 和 输入框的 尺寸， small 时略为紧凑*/
@@ -155,7 +175,7 @@ const slots = defineSlots<{
   /** 欢迎插槽 */
   welcome(props: {}): any;
 }>();
-//********** 变量 ********
+//********************** 变量 ***********************
 const fullscreen = defineModel("fullscreen", { type: Boolean, default: false });
 const show = defineModel("show", { type: Boolean, default: false });
 
@@ -170,8 +190,34 @@ const loading = computed(() => {
 
 const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
 
-// ************ 方法 ************
-// 处理 pill 下拉菜单点击事件
+const bubbleStore = {
+  mdConfig: { html: true },
+  dompurifyConfig: { ADD_TAGS: ["schema-card"], ADD_ATTR: ["schema"] },
+};
+
+// 配置 Content 渲染器匹配规则
+const contentRendererMatches: BubbleContentRendererMatch[] = [
+  {
+    find: (message) => message.role === "assistant"
+    ,
+    renderer: markRaw(StartContentRenderer),
+    priority: BubbleRendererMatchPriority.NORMAL,
+  },
+]
+
+// 配置 Box 渲染器匹配规则
+// const boxRendererMatches: BubbleBoxRendererMatch[] = [
+//   {
+//     find: (message) => {
+//       console.log("正匹配box", message);
+//       return message.role === "assistant"
+//     },
+//     renderer: markRaw(StartContentRenderer),
+//     priority: BubbleRendererMatchPriority.NORMAL,
+//   },
+// ]
+
+// ****************** 方法 ***********************
 const handlePillItemClick = (menu: PillItemMenu) => {
   inputMessage.value = menu.inputMessage;
 };
@@ -186,7 +232,18 @@ const cancelRequest = () => {
   props.nextAgent.cancelChat();
 };
 // 处理上传文件事件
-const handleUploadFiles = (files: File[]) => { };
+const handleUploadFiles = (files: File[]) => {
+  // TODO: 处理上传文件事件
+};
+
+// ********************* 生命周期 ***********************
+onMounted(() => {
+  // 注册自定义元素
+  if (!customElements.get("schema-card")) {
+    const CardElement = defineCustomElement(SchemaCard);
+    customElements.define("schema-card", CardElement);
+  }
+});
 </script>
 
 <style>

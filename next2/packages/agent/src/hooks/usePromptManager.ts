@@ -43,8 +43,10 @@ export function usePromptManager(agent: NextAgent) {
   // 对话开始时，自动添加系统提示词。
   // ToolLoopAgent 没有system属性了， 且不允许同时设置 prompt, messages属性。 所以才手动拼接messages数组
   agent.$lifeCycle.on("chatStart", () => {
-    agent.messages = agent.messages.filter((msg) => msg.role !== "system");
-    agent.messages.unshift({
+    agent.messages.value = agent.messages.value.filter(
+      (msg) => msg.role !== "system",
+    );
+    agent.messages.value.unshift({
       role: "system",
       content: promptManager.getAll(),
     });

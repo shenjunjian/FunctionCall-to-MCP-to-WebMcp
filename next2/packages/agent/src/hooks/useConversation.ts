@@ -66,8 +66,8 @@ export function useConversation(agent: NextAgent) {
   // 注册钩子函数
   function syncMsgAndSave() {
     const current = conversations.value[0];
-    current.messages = agent.messages;
-    current.uiMessages = agent.uiMessages;
+    current.messages = agent.messages.value;
+    current.uiMessages = agent.uiMessages.value;
     _save(conversations, maxConversations);
   }
 

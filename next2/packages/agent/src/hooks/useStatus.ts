@@ -26,7 +26,7 @@ export const useStatus = (agent: NextAgent) => {
   });
 
   agent.$lifeCycle.on("chatEnd", () => {
-    const last = agent.uiMessages.slice(-1)[0] as {
+    const last = agent.uiMessages.value.slice(-1)[0] as {
       content: Ref<StartContent>;
     };
     if (last) {

@@ -36,9 +36,9 @@ export class NextAgent {
 
   // **************** 消息管理 ****************
   /** 对话消息, 包含用户消息和ai回复。在ai 对话结束才一次性插入 */
-  messages: ModelMessage[] = [];
+  messages: Ref<ModelMessage[]> = ref([]);
   /** 用户界面渲染的消息体。 其中ai 的消息为 ref 的响应式数据， 根据流事件，进行实时更新 */
-  uiMessages: UIMessage[] = [];
+  uiMessages: Ref<UIMessage[]> = ref([]);
 
   // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
   $lifeCycle = useLifeCycle(this);
@@ -77,13 +77,13 @@ export class NextAgent {
   async chatStream(message: UserModelMessage) {
     this.abortController = new AbortController();
 
-    this.messages.push(message);
-    this.uiMessages.push(message);
+    this.messages.value.push(message);
+    this.uiMessages.value.push(message);
 
     await this.$lifeCycle.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
-      messages: this.messages,
+      messages: this.messages.value,
       abortSignal: this.abortController.signal,
     });
 
@@ -93,7 +93,7 @@ export class NextAgent {
       onFinish: async () => {
         // stream.response.message 就是ai-sdk 包装的ai 多轮对话消息, 拼接到**主消息列表**
         const aiMessages = (await streamResult.response).messages;
-        this.messages = this.messages.concat(aiMessages);
+        this.messages.value = this.messages.value.concat(aiMessages);
 
         await this.$lifeCycle.emit("chatEnd", aiMessages);
         dp.resolve();
@@ -104,7 +104,7 @@ export class NextAgent {
     });
     // 立即返回的一个ref数据，拼接到 **UI消息列表**
     const startContent = visitor.traverse(streamResult);
-    this.uiMessages.push({
+    this.uiMessages.value.push({
       role: "assistant",
       content: startContent,
     });
@@ -123,18 +123,22 @@ export class NextAgent {
     if (["streaming", "processing"].includes(this.status.value)) return;
 
     // 截断UI 消息
-    let lastUserIndex = this.uiMessages.findLastIndex(
+    let lastUserIndex = this.uiMessages.value.findLastIndex(
       (msg) => msg.role === "user",
     );
     if (lastUserIndex === -1) return;
-    this.uiMessages = this.uiMessages.slice(0, lastUserIndex);
+    this.uiMessages.value = this.uiMessages.value.slice(0, lastUserIndex);
 
     // 截断对话消息，并获取最后一条用户消息
-    lastUserIndex = this.messages.findLastIndex((msg) => msg.role === "user");
+    lastUserIndex = this.messages.value.findLastIndex(
+      (msg) => msg.role === "user",
+    );
     if (lastUserIndex === -1) return;
 
-    const lastUserMessage = this.messages[lastUserIndex] as UserModelMessage;
-    this.messages = this.messages.slice(0, lastUserIndex);
+    const lastUserMessage = this.messages.value[
+      lastUserIndex
+    ] as UserModelMessage;
+    this.messages.value = this.messages.value.slice(0, lastUserIndex);
 
     await this.$lifeCycle.emit("reChat");
 
