@@ -7,11 +7,12 @@ import {
 import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
-import { type Ref } from "vue";
+import { ref, type Ref } from "vue";
 import { useLifeCycle } from "./hooks/useLifeCycle";
 import { useConversation } from "./hooks/useConversation";
 import { usePromptManager } from "./hooks/usePromptManager";
 import { useMcpServers } from "./hooks/useMcpServers";
+import { useStatus, type NextAgentStatus } from "./hooks/useStatus";
 
 /** 用户界面渲染的消息体 */
 export type UIMessage =
@@ -21,13 +22,6 @@ export type UIMessage =
       content: Ref<StartContent | undefined>;
     };
 
-export type NextAgentStatus =
-  | "init" // 初始状态
-  | "processing" // AI请求正在处理中, 还未响应，显示加载动画
-  | "streaming" // 流式响应中分块数据返回中
-  | "error"
-  | "aborted"
-  | "finished";
 export class NextAgent {
   /** 调试流， 是否打印流数据 */
   private debugStream: boolean = false;
@@ -45,13 +39,13 @@ export class NextAgent {
   messages: ModelMessage[] = [];
   /** 用户界面渲染的消息体。 其中ai 的消息为 ref 的响应式数据， 根据流事件，进行实时更新 */
   uiMessages: UIMessage[] = [];
-  status: NextAgentStatus = "init";
 
   // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
   $lifeCycle = useLifeCycle(this);
   $conversation = useConversation(this);
   $promptManager = usePromptManager(this);
   $mcpServers = useMcpServers(this);
+  status: Ref<NextAgentStatus> = useStatus(this);
 
   /** 初始化智能体， 设置大语言模型
    *  @param settings 智能体参数设置, 参考 ai-sdk 的 ToolLoopAgent() 的入参：https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent#parameters
@@ -75,10 +69,12 @@ export class NextAgent {
       ...settings,
       tools: this.$mcpServers.tools,
     });
+
+    // oxlint-disable-next-line typescript/no-floating-promises
+    this.$lifeCycle.emit("initAgent");
   }
   /** 发起对话， 参数 message 为标准的ai-sdk参数： string | Array<TextPart | ImagePart | FilePart> */
   async chatStream(message: UserModelMessage) {
-    this.status = "processing";
     this.abortController = new AbortController();
 
     this.messages.push(message);
@@ -99,18 +95,11 @@ export class NextAgent {
         const aiMessages = (await streamResult.response).messages;
         this.messages = this.messages.concat(aiMessages);
 
-        this.status =
-          startContent?.value?.finishReason === "error"
-            ? "error"
-            : startContent?.value?.finishReason === "other"
-              ? "aborted"
-              : "finished";
         await this.$lifeCycle.emit("chatEnd", aiMessages);
         dp.resolve();
       },
-      onStep: () => {
-        // 当返回 step数据时，才开始流返回
-        this.status = "streaming";
+      onStep: async () => {
+        await this.$lifeCycle.emit("chatStep");
       },
     });
     // 立即返回的一个ref数据，拼接到 **UI消息列表**
@@ -130,6 +119,9 @@ export class NextAgent {
 
   /** 重复上次对话 */
   async reLastChat() {
+    // 加载状态，不允许重复对话。只有结束了，才显示 重复按钮
+    if (["streaming", "processing"].includes(this.status.value)) return;
+
     // 截断UI 消息
     let lastUserIndex = this.uiMessages.findLastIndex(
       (msg) => msg.role === "user",

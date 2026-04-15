@@ -1,5 +1,10 @@
 <template>
-  <TrContainer v-model:show="show" v-model:fullscreen="fullscreen" :title="title" class="tiny-remoter-wrap">
+  <TrContainer
+    v-model:show="show"
+    v-model:fullscreen="fullscreen"
+    :title="title"
+    class="tiny-remoter-wrap"
+  >
     <template #title>
       <h3 class="tr-container__title">
         <slot name="title" :title="title">{{ title }}</slot>
@@ -7,76 +12,100 @@
     </template>
     <template #operations>
       <slot name="operations">
-        <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="nextAgent.$conversation.createConversation()" />
-        <div style="position: relative;">
-        <tr-icon-button :icon="IconHistory" size="28" svgSize="20" @click="showHistory = !showHistory" />
-         <div v-show="showHistory" class="tr-history-custom-container">
-          <div><h3 style="margin: 0; padding: 0 12px">历史对话</h3></div>
+        <tr-icon-button
+          :icon="IconNewSession"
+          size="28"
+          svgSize="20"
+          @click="nextAgent.$conversation.createConversation()"
+        />
+        <div style="position: relative">
           <tr-icon-button
-            :icon="IconClose"
+            :icon="IconHistory"
             size="28"
             svgSize="20"
-            @click="showHistory = false"
-            style="position: absolute; right: 14px; top: 14px"
+            @click="showHistory = !showHistory"
           />
-        <tr-history
-           class="tr-history-custom"
-          :data="nextAgent.$conversation.conversations.value"
-          :show-rename-controls="isTouchDevice"
-          :selected="nextAgent.$conversation.conversations.value[0]?.id"
-          @item-click="(item) => nextAgent.$conversation.switchConversation(item)"
-          @item-title-change="(newTitle, item) => nextAgent.$conversation.renameConversation(item, newTitle)"
-          @item-action="(action, item) => action.id === 'delete' && nextAgent.$conversation.deleteConversation(item)"
-        />
+          <div v-show="showHistory" class="tr-history-custom-container">
+            <div><h3 style="margin: 0; padding: 0 12px">历史对话</h3></div>
+            <tr-icon-button
+              :icon="IconClose"
+              size="28"
+              svgSize="20"
+              @click="showHistory = false"
+              style="position: absolute; right: 14px; top: 14px"
+            />
+            <tr-history
+              class="tr-history-custom"
+              :data="nextAgent.$conversation.conversations.value"
+              :show-rename-controls="isTouchDevice"
+              :selected="nextAgent.$conversation.conversations.value[0]?.id"
+              @item-click="(item) => nextAgent.$conversation.switchConversation(item)"
+              @item-title-change="
+                (newTitle, item) => nextAgent.$conversation.renameConversation(item, newTitle)
+              "
+              @item-action="
+                (action, item) =>
+                  action.id === 'delete' && nextAgent.$conversation.deleteConversation(item)
+              "
+            />
+          </div>
         </div>
-      </div>
       </slot>
     </template>
     <template #default>
       <slot name="default">
-        <div> 默认插槽 </div>
+        <div>默认插槽</div>
       </slot>
     </template>
     <template #footer>
       <slot name="footer">
-          <div class="chat-input" :class="{ 'max-container': fullscreen }">
-            <div class="chat-input-pills">
-              <tr-dropdown-menu
-                  v-for="pill in pillItems"
-                  :key="pill.id"
-                  :items="pill.menus"
-                  @item-click="handlePillItemClick"
-                  trigger="click"
-                >
-                  <template #trigger>
-                    <TrSuggestionPillButton>{{ pill.text }}</TrSuggestionPillButton>
-                  </template>
-                </tr-dropdown-menu>
-            </div>
-            <tr-sender
-              ref="senderRef"
-              mode="single"
-              v-model="inputMessage"
-              :class="{ 'tr-sender-compact': !fullscreen }"
-              :placeholder="nextAgent.status === 'processing' ? '正在思考中...' : '请输入您的问题'"
-                  :showWordLimit="true"
-              :maxLength="20000"
-              :clearable="true"
-              :loading="false"
-              @submit="handleSendMessage"
-              @cancel="cancelRequest"
-            ></tr-sender>
-      </div>
+        <div class="tiny-remoter-chat-input" :class="{ 'max-container': fullscreen }">
+          <div class="chat-input-pills">
+            <tr-dropdown-menu
+              v-for="pill in pillItems"
+              :key="pill.id"
+              :items="pill.menus"
+              @item-click="handlePillItemClick"
+              trigger="click"
+            >
+              <template #trigger>
+                <TrSuggestionPillButton>{{ pill.text }}</TrSuggestionPillButton>
+              </template>
+            </tr-dropdown-menu>
+          </div>
+          <tr-sender
+            ref="senderRef"
+            mode="multiple"
+            v-model="inputMessage"
+            :class="{ 'tr-sender-compact': !fullscreen }"
+            :placeholder="loading ? '正在思考中...' : '请输入您的问题'"
+            :loading="loading"
+            showWordLimit
+            :maxLength="20000"
+            :clearable="true"
+            @submit="handleSendMessage"
+            @cancel="cancelRequest"
+          ></tr-sender>
+        </div>
       </slot>
     </template>
   </TrContainer>
 </template>
 <script setup lang="ts">
-import { TrContainer, TrIconButton, TrHistory, useTouchDevice,     TrSender,  TrSuggestionPillButton, type StructuredData,   } from "@opentiny/tiny-robot";
+import {
+  TrContainer,
+  TrIconButton,
+  TrHistory,
+  useTouchDevice,
+  TrSender,
+  TrSuggestionPillButton,
+  TrDropdownMenu,
+  type StructuredData,
+} from "@opentiny/tiny-robot";
 import { IconNewSession, IconHistory, IconClose } from "@opentiny/tiny-robot-svgs";
 import { NextAgent } from "next-agent";
-import { ref, type PropType } from "vue";
-import {  pillItems, type PillItem, type PillItemMenu } from "./utils/const";
+import { computed, ref, type PropType } from "vue";
+import { pillItems, type PillItem, type PillItemMenu } from "./utils/const";
 
 // 尺寸，定位等，参考  https://opentiny.github.io/tiny-robot/latest/components/container.html#css-变量
 // 也可以直接绑定 style, 直接透传到 TrContainer 组件上。
@@ -94,10 +123,9 @@ const props = defineProps({
   /** 自定义输入框上方快捷操作按钮（与 pill 下拉菜单格式一致）。不传则使用内置默认文案 */
   pillItems: {
     type: Array as PropType<PillItem[]>,
-    default: pillItems
-  }
+    default: pillItems,
+  },
 });
-
 
 const slots = defineSlots<{
   /** 顶部标题插槽 */
@@ -109,30 +137,37 @@ const slots = defineSlots<{
   /** 底部插槽 ---- 包含输入和发送按钮等 */
   footer(props: {}): any;
 }>();
-//********** 变量 ********  
+//********** 变量 ********
 const fullscreen = defineModel("fullscreen", { type: Boolean, default: false });
 const show = defineModel("show", { type: Boolean, default: false });
 
 const { isTouchDevice } = useTouchDevice();
 const showHistory = ref(false);
-const inputMessage=ref('')
+const inputMessage = ref("");
+const loading = computed(() => {
+  return (
+    props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming"
+  );
+});
 // ************ 方法 ************
 // 处理 pill 下拉菜单点击事件
 const handlePillItemClick = (menu: PillItemMenu) => {
-  inputMessage.value = menu.inputMessage
-}
-const handleSendMessage = async (textContent: string, structuredData?: StructuredData | undefined) => {
-   props.nextAgent.chatStream({role: 'user', content: textContent})
-}
+  inputMessage.value = menu.inputMessage;
+};
+const handleSendMessage = async (
+  textContent: string,
+  structuredData?: StructuredData | undefined,
+) => {
+  props.nextAgent.chatStream({ role: "user", content: textContent });
+  inputMessage.value = "";
+};
 const cancelRequest = () => {
-   props.nextAgent.cancelChat()
-}
+  props.nextAgent.cancelChat();
+};
 </script>
 
 <style>
-.tiny-remoter-wrap{
-  justify-content: space-between;
-}
+/** 历史对话弹窗 */
 .tr-history-custom-container {
   position: absolute;
   right: 100%;
@@ -147,15 +182,34 @@ const cancelRequest = () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-
-  .tr-history-custom {
-    overflow-y: auto;
-    flex: 1;
-
-    --tr-history-item-selected-bg: var(--tr-history-item-hover-bg);
-    --tr-history-item-selected-color: var(--tr-color-primary);
-    --tr-history-item-space-y: 4px;
-  }
 }
 
+.tr-history-custom-container .tr-history-custom {
+  overflow-y: auto;
+  flex: 1;
+
+  --tr-history-item-selected-bg: var(--tr-history-item-hover-bg);
+  --tr-history-item-selected-color: var(--tr-color-primary);
+  --tr-history-item-space-y: 4px;
+}
+
+/** 输入框 及 pill 样式*/
+.tiny-remoter-chat-input {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tiny-remoter-chat-input .chat-input-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tiny-remoter-chat-input .pills {
+  flex: 1;
+  :deep(.tr-suggestion-pills__container) {
+    mask: linear-gradient(to right, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+  }
+}
 </style>
