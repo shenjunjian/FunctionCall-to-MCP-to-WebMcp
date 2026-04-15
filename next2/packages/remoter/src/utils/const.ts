@@ -1,7 +1,7 @@
 // 构造 SuggestionPills 对象
 export const mapMake = (str: string, id: number) => {
   const [text, inputMessage] = str.split("#");
-  return { id, text, inputMessage };
+  return { id: id.toString(), text: text, inputMessage };
 };
 
 // 默认的 pillItems
