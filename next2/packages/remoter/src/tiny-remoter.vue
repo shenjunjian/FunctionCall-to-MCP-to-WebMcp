@@ -37,11 +37,10 @@
             </tr-welcome>
           </div>
         </slot>
-        <!-- <tr-bubble-provider v-else>
-          <tr-bubble-list style="flex: 1" :items="nextAgent.uiMessages" :roles="roles" :loading="loading"
-            loading-role="assistant" auto-scroll>
+        <tr-bubble-provider v-if="nextAgent.uiMessages.length > 0">
+          <tr-bubble-list style="flex: 1" :messages="nextAgent.uiMessages" v-bind="bubbleListConfig">
           </tr-bubble-list>
-        </tr-bubble-provider> -->
+        </tr-bubble-provider>
       </slot>
     </template>
     <template #footer>
@@ -84,11 +83,13 @@ import {
   VoiceButton,
   TrWelcome,
   TrBubbleList,
+  BubbleRenderers,
   type StructuredData,
   type VoiceButtonProps,
   type UploadButtonProps,
+  type BubbleListProps,
 } from "@opentiny/tiny-robot";
-import { IconNewSession, IconHistory, IconClose } from "@opentiny/tiny-robot-svgs";
+import { IconNewSession, IconHistory, IconClose, IconAi, IconUser } from "@opentiny/tiny-robot-svgs";
 import { NextAgent } from "next-agent";
 import { computed, h, ref, type PropType } from "vue";
 import { pillItems, type PillItem, type PillItemMenu } from "./utils/const";
@@ -121,6 +122,19 @@ const props = defineProps({
   uploadButtonConfig: {
     type: Object as PropType<UploadButtonProps>,
     default: () => ({}),
+  },
+  /** 聊天内容区域 配置，参考 https://docs.opentiny.design/tiny-robot/components/bubble.html#props 
+   * 可以设置： 分组策略、角色的头像，位置，形状、 内容渲染模式、autoScroll 等
+   */
+  bubbleListConfig: {
+    type: Object as PropType<BubbleListProps>,
+    default: () => ({
+      autoScroll: true,
+      roleConfigs: {
+        user: { avatar: h(IconUser, { style: { fontSize: '32px' } }), placement: 'end', shape: 'corner' },
+        assistant: { avatar: h(IconAi, { style: { fontSize: '32px' } }), placement: 'start', shape: 'corner' },
+      }
+    }),
   },
   /** 聊天内容区域 和 输入框的 尺寸， small 时略为紧凑*/
   size: {
@@ -155,6 +169,7 @@ const loading = computed(() => {
 });
 
 const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
+
 // ************ 方法 ************
 // 处理 pill 下拉菜单点击事件
 const handlePillItemClick = (menu: PillItemMenu) => {

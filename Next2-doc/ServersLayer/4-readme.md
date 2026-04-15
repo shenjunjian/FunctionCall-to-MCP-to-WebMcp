@@ -37,3 +37,6 @@
     type?: string,
 }
 ```
+
+> 最大的痛，是基于浏览器的agent, 无法引用 stdio 类型的mcpServer。
+ 比如 ： chrome devtools mcp 工具，就只允许npx chrome-devtools-mcp@latest。
