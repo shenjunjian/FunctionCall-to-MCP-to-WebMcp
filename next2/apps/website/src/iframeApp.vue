@@ -34,7 +34,7 @@ setTimeout(() => {
 </script>
 
 <template>
-  <tiny-remoter :next-agent="agent" :show="true" :fullscreen="false" title="xxxx 系统">
+  <tiny-remoter :next-agent="agent" :show="true" :fullscreen="false" title="xxxx 系统" size="small">
     <template #title="{ title }"> ***{{ title }} **** </template>
   </tiny-remoter>
 </template>

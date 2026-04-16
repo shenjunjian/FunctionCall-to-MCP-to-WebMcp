@@ -1,3 +1,5 @@
+// *************** pills ***************
+
 // 构造 SuggestionPills 对象
 export const mapMake = (str: string, id: number) => {
   const [text, inputMessage] = str.split("#");
@@ -38,3 +40,7 @@ export const pillItems = [
 
 export type PillItem = (typeof pillItems)[number];
 export type PillItemMenu = (typeof pillItems)[number]["menus"][number];
+
+// *************** store key ***************
+
+export const bubbleStoreKey = "bubbleStoreKey";

@@ -32,14 +32,14 @@
     <template #default>
       <slot name="default">
         <slot name="welcome">
-          <div style="flex: 1" v-if="nextAgent.uiMessages.value.length === 0">
+          <div v-if="nextAgent.uiMessages.value.length === 0">
             <tr-welcome :title="title" description="我是你的私人智能助手" :icon="welcomeIcon">
             </tr-welcome>
           </div>
         </slot>
         <tr-bubble-provider :store="bubbleStore" :content-renderer-matches="contentRendererMatches">
-          <tr-bubble-list v-if="nextAgent.uiMessages.value.length > 0" style="flex: 1"
-            :messages="nextAgent.uiMessages.value" v-bind="bubbleListConfig">
+          <tr-bubble-list v-if="nextAgent.uiMessages.value.length > 0" :messages="nextAgent.uiMessages.value"
+            :class="{ 'bubble-list--small': size === 'small' }" v-bind="bubbleListConfig">
           </tr-bubble-list>
         </tr-bubble-provider>
       </slot>
@@ -101,8 +101,8 @@ import {
   IconUser,
 } from "@opentiny/tiny-robot-svgs";
 import { NextAgent } from "next-agent";
-import { computed, defineCustomElement, h, markRaw, onMounted, ref, type PropType } from "vue";
-import { pillItems, type PillItem, type PillItemMenu } from "./utils/const";
+import { computed, defineCustomElement, h, markRaw, onMounted, provide, reactive, ref, type PropType } from "vue";
+import { bubbleStoreKey, pillItems, type PillItem, type PillItemMenu } from "./utils/const";
 import WelcomeLogo from "./components/welcome-logo.vue";
 import SchemaCard from "./components/schema-card.ce.vue";
 import StartContentRenderer from "./components/start-content-renderer.vue";
@@ -156,7 +156,7 @@ const props = defineProps({
       },
     }),
   },
-  /** 聊天内容区域 和 输入框的 尺寸， small 时略为紧凑*/
+  /** 聊天内容区域 和 输入框的 尺寸， small 时更为紧凑*/
   size: {
     type: String as PropType<"normal" | "small">,
     default: "normal",
@@ -190,10 +190,12 @@ const loading = computed(() => {
 
 const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
 
-const bubbleStore = {
+const bubbleStore = reactive({
   mdConfig: { html: true },
   dompurifyConfig: { ADD_TAGS: ["schema-card"], ADD_ATTR: ["schema"] },
-};
+  toolCallResults: {},
+});
+provide(bubbleStoreKey, bubbleStore);
 
 // 配置 Content 渲染器匹配规则
 const contentRendererMatches: BubbleContentRendererMatch[] = [
@@ -271,6 +273,11 @@ onMounted(() => {
   --tr-history-item-selected-bg: var(--tr-history-item-hover-bg);
   --tr-history-item-selected-color: var(--tr-color-primary);
   --tr-history-item-space-y: 4px;
+}
+
+.bubble-list--small {
+  --tr-bubble-list-gap: 8px;
+  --tr-bubble-text-line-height: 1.2;
 }
 
 /** 输入框 及 pill 样式*/
