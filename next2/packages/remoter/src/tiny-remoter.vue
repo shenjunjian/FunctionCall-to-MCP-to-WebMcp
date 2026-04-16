@@ -7,10 +7,11 @@
     </template>
     <template #operations>
       <slot name="operations">
-        <tr-icon-button :icon="IconNewSession" size="28" svgSize="20"
+        <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" data-title-down="新建对话"
           @click="nextAgent.$conversation.createConversation()" />
         <div style="position: relative">
-          <tr-icon-button :icon="IconHistory" size="28" svgSize="20" @click="showHistory = !showHistory" />
+          <tr-icon-button :icon="IconHistory" size="28" svgSize="20" @click="showHistory = !showHistory"
+            data-title-down="历史对话" />
           <div v-show="showHistory" class="tr-history-custom-container" v-on-click-outside="() => showHistory = false">
             <div>
               <h3 style="margin: 0; padding: 0 12px">历史对话</h3>
@@ -124,12 +125,12 @@ const props = defineProps({
   },
   /** 语音输入按钮配置，设置false则隐藏按钮。 配置参考 https://docs.opentiny.design/tiny-robot/components/sender.html#voicebutton */
   voiceButtonConfig: {
-    type: [Object as PropType<VoiceButtonProps>, Boolean],
+    type: Object as PropType<VoiceButtonProps>,
     default: () => ({}),
   },
   /** 上传按钮配置，设置false则隐藏按钮。 配置参考 https://docs.opentiny.design/tiny-robot/components/sender.html#uploadbutton */
   uploadButtonConfig: {
-    type: [Object as PropType<UploadButtonProps>, Boolean],
+    type: Object as PropType<UploadButtonProps>,
     default: () => ({}),
   },
   /** 聊天内容区域 配置，参考 https://docs.opentiny.design/tiny-robot/components/bubble.html#props
