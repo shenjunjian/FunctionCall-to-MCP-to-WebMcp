@@ -192,30 +192,19 @@ const bubbleStore = reactive({
   mdConfig: { html: true },
   dompurifyConfig: { ADD_TAGS: ["schema-card"], ADD_ATTR: ["schema"] },
   toolCallResults: {},
+  reChat: () => props.nextAgent.reLastChat() // 重新对话
 });
 provide(bubbleStoreKey, bubbleStore);
 
 // 配置 Content 渲染器匹配规则
 const contentRendererMatches: BubbleContentRendererMatch[] = [
   {
-    find: (message) => message.role === "assistant"
-    ,
+    find: (message) => message.role === "assistant",
     renderer: markRaw(StartContentRenderer),
     priority: BubbleRendererMatchPriority.NORMAL,
   },
 ]
 
-// 配置 Box 渲染器匹配规则
-// const boxRendererMatches: BubbleBoxRendererMatch[] = [
-//   {
-//     find: (message) => {
-//       console.log("正匹配box", message);
-//       return message.role === "assistant"
-//     },
-//     renderer: markRaw(StartContentRenderer),
-//     priority: BubbleRendererMatchPriority.NORMAL,
-//   },
-// ]
 
 // ****************** 方法 ***********************
 const handlePillItemClick = (menu: PillItemMenu) => {

@@ -11,7 +11,7 @@ export class PromptManager {
   /** 返回全量的提示词 */
   getAll() {
     return `
-当前时间：${new Date().toLocaleDateString()}。
+当前时间：${new Date().toLocaleDateString()}。 思考内容和回复内容都要 用中文，简短，保持在2句话内。
 ${this.staticPrompt}
 ${this.skillMetaPrompt}
 ${this.tempPrompt}
