@@ -16,6 +16,8 @@
     "@opentiny/tiny-robot-svgs": "^0.4.1",
     "@opentiny/tiny-schema-renderer": "^1.0.0-beta.6",
     "@opentiny/vue-theme": "^3.20.0",
+    "@vueuse/core": "^14.0.0",
+    "@vueuse/components": "^14.0.0",
     "next-agent": "workspace:*",
     "vue": "^3.5.30"
   },

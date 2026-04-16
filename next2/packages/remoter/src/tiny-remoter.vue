@@ -11,7 +11,7 @@
           @click="nextAgent.$conversation.createConversation()" />
         <div style="position: relative">
           <tr-icon-button :icon="IconHistory" size="28" svgSize="20" @click="showHistory = !showHistory" />
-          <div v-show="showHistory" class="tr-history-custom-container">
+          <div v-show="showHistory" class="tr-history-custom-container" v-on-click-outside="() => showHistory = false">
             <div>
               <h3 style="margin: 0; padding: 0 12px">历史对话</h3>
             </div>
@@ -97,6 +97,7 @@ import {
   IconAi,
   IconUser,
 } from "@opentiny/tiny-robot-svgs";
+import { vOnClickOutside } from "@vueuse/components";
 import { NextAgent } from "next-agent";
 import { computed, defineCustomElement, h, markRaw, onMounted, provide, reactive, ref, type PropType } from "vue";
 import { bubbleStoreKey, pillItems, type PillItem, type PillItemMenu } from "./utils/const";
