@@ -8,7 +8,6 @@ import type { StartContent } from "./streamVisitor";
 import { StreamVisitor } from "./streamVisitor";
 import { DelayedPromise } from "@ai-sdk/provider-utils";
 import { ref, type Ref } from "vue";
-import { useLifeCycle } from "./hooks/useLifeCycle";
 import { useConversation } from "./hooks/useConversation";
 import { usePromptManager } from "./hooks/usePromptManager";
 import { useMcpServers } from "./hooks/useMcpServers";
@@ -21,7 +20,14 @@ export type UIMessage =
       role: "assistant";
       content: Ref<StartContent | undefined>;
     };
-
+/** 生命周期存储集合 */
+const cbMap = {
+  initAgent: [] as Function[], // 初始化智能体后触发
+  chatStart: [] as Function[], // 压入usr消息后触发
+  chatStep: [] as Function[], // 每次返回step数据后触发
+  chatEnd: [] as Function[], // 压入ai消息后触发
+  reChat: [] as Function[], // 重新发起对话, 清除上次对话记录后触发
+};
 export class NextAgent {
   /** 调试流， 是否打印流数据 */
   private debugStream: boolean = false;
@@ -40,8 +46,14 @@ export class NextAgent {
   /** 用户界面渲染的消息体。 其中ai 的消息为 ref 的响应式数据， 根据流事件，进行实时更新 */
   uiMessages: Ref<UIMessage[]> = ref([]);
 
-  // **************** 钩子管理/ 状态管理 ($打头是状态管理变量)  ****************
-  $lifeCycle = useLifeCycle(this);
+  // **************** 生命周期管理 ****************
+  emit = async (type: keyof typeof cbMap, ...args: any[]) => {
+    for (const cb of cbMap[type]) await cb(...args);
+  };
+
+  on = (type: keyof typeof cbMap, cb: Function) => cbMap[type].push(cb);
+
+  // ****************  状态管理 ($打头是状态管理变量)  ****************
   $conversation = useConversation(this);
   $promptManager = usePromptManager(this);
   $mcpServers = useMcpServers(this);
@@ -71,7 +83,7 @@ export class NextAgent {
     });
 
     // oxlint-disable-next-line typescript/no-floating-promises
-    this.$lifeCycle.emit("initAgent");
+    this.emit("initAgent");
   }
   /** 发起对话， 参数 message 为标准的ai-sdk参数： string | Array<TextPart | ImagePart | FilePart> */
   async chatStream(message: UserModelMessage) {
@@ -80,7 +92,7 @@ export class NextAgent {
     this.messages.value.push(message);
     this.uiMessages.value.push(message);
 
-    await this.$lifeCycle.emit("chatStart", message);
+    await this.emit("chatStart", message);
 
     const streamResult = await this.mainAgent!.stream({
       messages: this.messages.value,
@@ -95,11 +107,11 @@ export class NextAgent {
         const aiMessages = (await streamResult.response).messages;
         this.messages.value = this.messages.value.concat(aiMessages);
 
-        await this.$lifeCycle.emit("chatEnd", aiMessages);
+        await this.emit("chatEnd", aiMessages);
         dp.resolve();
       },
       onStep: async () => {
-        await this.$lifeCycle.emit("chatStep");
+        await this.emit("chatStep");
       },
     });
     // 立即返回的一个ref数据，拼接到 **UI消息列表**
@@ -140,7 +152,7 @@ export class NextAgent {
     ] as UserModelMessage;
     this.messages.value = this.messages.value.slice(0, lastUserIndex);
 
-    await this.$lifeCycle.emit("reChat");
+    await this.emit("reChat");
 
     // 重新调用 chatStream
     await this.chatStream(lastUserMessage);

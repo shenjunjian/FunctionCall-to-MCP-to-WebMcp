@@ -71,8 +71,8 @@ export function useConversation(agent: NextAgent) {
     _save(conversations, maxConversations);
   }
 
-  agent.$lifeCycle.on("chatStart", syncMsgAndSave);
-  agent.$lifeCycle.on("chatEnd", syncMsgAndSave);
+  agent.on("chatStart", syncMsgAndSave);
+  agent.on("chatEnd", syncMsgAndSave);
 
   return {
     maxConversations,

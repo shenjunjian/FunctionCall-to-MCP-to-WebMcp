@@ -21,11 +21,11 @@ export const useStatus = (agent: NextAgent) => {
     else status.value = "finished";
   }
   // **************** 生命周期  ****************
-  agent.$lifeCycle.on("chatStart", () => {
+  agent.on("chatStart", () => {
     setStatus("processing");
   });
 
-  agent.$lifeCycle.on("chatEnd", () => {
+  agent.on("chatEnd", () => {
     const last = agent.uiMessages.value.slice(-1)[0] as {
       content: Ref<StartContent>;
     };
@@ -34,7 +34,7 @@ export const useStatus = (agent: NextAgent) => {
     }
   });
 
-  agent.$lifeCycle.on("chatStep", () => {
+  agent.on("chatStep", () => {
     setStatus("streaming");
   });
   return status;
