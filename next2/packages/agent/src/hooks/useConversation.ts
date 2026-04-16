@@ -36,17 +36,30 @@ export function useConversation(agent: NextAgent) {
   function createConversation() {
     const conversation = _create();
     conversations.value.unshift(conversation);
+
+    // 修改agent的消息列表
+    agent.messages.value = conversation.messages;
+    agent.uiMessages.value = conversation.uiMessages;
+
     return conversation;
   }
   /** 交换到队首，更新当前会话 */
   function switchConversation(conversation: Conversation) {
     deleteConversation(conversation);
     conversations.value.unshift(conversation);
+
+    // 修改agent的消息列表
+    agent.messages.value = conversation.messages;
+    agent.uiMessages.value = conversation.uiMessages;
+    // 保存到本地存储
     _save(conversations, maxConversations);
     log("switchConversation", conversation);
   }
   /** 删除会话 */
   function deleteConversation(conversation: Conversation) {
+    // 不能删除当前会话
+    if (conversation.id === conversations.value[0].id) return;
+
     conversations.value = conversations.value.filter(
       (c) => c.id !== conversation.id,
     );

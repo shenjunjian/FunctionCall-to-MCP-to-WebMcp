@@ -19,12 +19,9 @@
               style="position: absolute; right: 14px; top: 14px" />
             <tr-history class="tr-history-custom" :data="nextAgent.$conversation.conversations.value"
               :show-rename-controls="isTouchDevice" :selected="nextAgent.$conversation.conversations.value[0]?.id"
-              @item-click="(item) => nextAgent.$conversation.switchConversation(item)" @item-title-change="
-                (newTitle, item) => nextAgent.$conversation.renameConversation(item, newTitle)
-              " @item-action="
-                (action, item) =>
-                  action.id === 'delete' && nextAgent.$conversation.deleteConversation(item)
-              " />
+              @item-click="(item) => { nextAgent.$conversation.switchConversation(item); showHistory = false }"
+              @item-title-change="(newTitle, item) => nextAgent.$conversation.renameConversation(item, newTitle)"
+              @item-action="(action, item) => action.id === 'delete' && nextAgent.$conversation.deleteConversation(item)" />
           </div>
         </div>
       </slot>
