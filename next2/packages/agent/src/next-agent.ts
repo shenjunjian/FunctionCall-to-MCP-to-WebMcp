@@ -103,11 +103,15 @@ export class NextAgent {
     const visitor = new StreamVisitor({
       debug: this.debugStream,
       onFinish: async () => {
-        // stream.response.message 就是ai-sdk 包装的ai 多轮对话消息, 拼接到**主消息列表**
-        const aiMessages = (await streamResult.response).messages;
-        this.messages.value = this.messages.value.concat(aiMessages);
+        try {
+          // stream.response.message 就是ai-sdk 包装的ai 多轮对话消息, 拼接到**主消息列表**
+          const aiMessages = (await streamResult.response).messages; // WARN: abort时， 这个流会错误，取不回response.messages,就会丢弃掉ai的消息
+          this.messages.value = this.messages.value.concat(aiMessages);
+        } catch (error) {
+          console.error("StreamVisitor onFinish error", error);
+        }
 
-        await this.emit("chatEnd", aiMessages);
+        await this.emit("chatEnd"); // abort 时, messages只有用户消息，没有ai消息
         dp.resolve();
       },
       onStep: async () => {

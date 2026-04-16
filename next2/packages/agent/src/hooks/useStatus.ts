@@ -1,5 +1,5 @@
 import { ref, type Ref } from "vue";
-import type { NextAgent } from "../next-agent";
+import type { NextAgent, UIMessage } from "../next-agent";
 import type { FinishReason } from "ai";
 import type { StartContent } from "../streamVisitor";
 
@@ -26,11 +26,11 @@ export const useStatus = (agent: NextAgent) => {
   });
 
   agent.on("chatEnd", () => {
-    const last = agent.uiMessages.value.slice(-1)[0] as {
-      content: Ref<StartContent>;
-    };
-    if (last) {
+    const last = agent.uiMessages.value.slice(-1)[0] as UIMessage;
+    if (last?.role === "assistant") {
       setStatus(last.content.value?.finishReason || "stop");
+    } else {
+      setStatus("stop");
     }
   });
 

@@ -58,9 +58,9 @@
             @cancel="cancelRequest">
             <template #footer-right>
               <!-- 上传按钮 -->
-              <UploadButton v-bind="uploadButtonConfig" @select="handleUploadFiles" />
+              <UploadButton v-if="uploadButtonConfig" v-bind="uploadButtonConfig" @select="handleUploadFiles" />
               <!-- 语音输入按钮. 暂时用“混合输入”， 因为测试“连续输入”有bug   -->
-              <VoiceButton v-bind="voiceButtonConfig" />
+              <VoiceButton v-if="voiceButtonConfig" v-bind="voiceButtonConfig" />
             </template>
           </tr-sender>
         </div>
@@ -82,7 +82,6 @@ import {
   TrWelcome,
   TrBubbleList,
   TrBubbleProvider,
-  BubbleRenderers,
   type StructuredData,
   type VoiceButtonProps,
   type UploadButtonProps,
@@ -123,14 +122,14 @@ const props = defineProps({
     type: Array as PropType<PillItem[]>,
     default: pillItems,
   },
-  /** 语音输入按钮配置，参考 https://docs.opentiny.design/tiny-robot/components/sender.html#voicebutton */
+  /** 语音输入按钮配置，设置false则隐藏按钮。 配置参考 https://docs.opentiny.design/tiny-robot/components/sender.html#voicebutton */
   voiceButtonConfig: {
-    type: Object as PropType<VoiceButtonProps>,
+    type: [Object as PropType<VoiceButtonProps>, Boolean],
     default: () => ({}),
   },
-  /** 上传按钮配置，参考 https://docs.opentiny.design/tiny-robot/components/sender.html#uploadbutton */
+  /** 上传按钮配置，设置false则隐藏按钮。 配置参考 https://docs.opentiny.design/tiny-robot/components/sender.html#uploadbutton */
   uploadButtonConfig: {
-    type: Object as PropType<UploadButtonProps>,
+    type: [Object as PropType<UploadButtonProps>, Boolean],
     default: () => ({}),
   },
   /** 聊天内容区域 配置，参考 https://docs.opentiny.design/tiny-robot/components/bubble.html#props
