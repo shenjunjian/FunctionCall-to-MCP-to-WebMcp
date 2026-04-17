@@ -99,6 +99,7 @@ import {
 } from "@opentiny/tiny-robot-svgs";
 import { vOnClickOutside } from "@vueuse/components";
 import { NextAgent } from "next-agent";
+import { type FilePart, type ImagePart, type UserModelMessage } from "ai";
 import { computed, defineCustomElement, h, markRaw, onMounted, provide, reactive, ref, type PropType } from "vue";
 import { bubbleStoreKey, pillItems, type PillItem, type PillItemMenu } from "./utils/const";
 import WelcomeLogo from "./components/welcome-logo.vue";
@@ -180,11 +181,10 @@ const show = defineModel("show", { type: Boolean, default: false });
 const { isTouchDevice } = useTouchDevice();
 const showHistory = ref(false);
 const inputMessage = ref("");
-const loading = computed(() => {
-  return (
-    props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming"
-  );
-});
+
+const loading = computed(() => props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming")
+/** 本次对话前，用户选择的文件 */
+let files: File[] = []
 
 const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
 
@@ -200,7 +200,7 @@ provide(bubbleStoreKey, bubbleStore);
 const contentRendererMatches: BubbleContentRendererMatch[] = [
   {
     find: (message) => message.role === "assistant",
-    renderer: markRaw(StartContentRenderer),
+    renderer: markRaw(StartContentRenderer) as any,
     priority: BubbleRendererMatchPriority.NORMAL,
   },
 ]
@@ -214,15 +214,43 @@ const handleSendMessage = async (
   textContent: string,
   structuredData?: StructuredData | undefined,
 ) => {
-  props.nextAgent.chatStream({ role: "user", content: textContent });
+  let message: UserModelMessage
+  // 1个文件，则判断图片后决定用 ImagePart。  
+  if (files.length === 1 && files[0].type.startsWith("image/")) {
+    message = {
+      role: "user", content: [
+        { type: "text", text: textContent },
+        { type: "image", image: await files[0].arrayBuffer(), mediaType: files[0].type } as ImagePart
+      ]
+    }
+  }
+  else {
+    // 多个文件，直接用 FilePart。
+    if (files.length > 0) {
+      const fileBuffers = await Promise.all(files.map((file) => file.arrayBuffer()));
+      message = {
+        role: "user", content: [
+          { type: "text", text: textContent },
+          ...fileBuffers.map((file, index) => ({ type: "file", data: file, mediaType: files[index].type } as FilePart))
+        ]
+      }
+    } else {
+      // 没有文件，直接用 TextPart。
+      message = { role: "user", content: textContent }
+    }
+  }
+
+  props.nextAgent.chatStream(message);
   inputMessage.value = "";
+  files = [];
 };
 const cancelRequest = () => {
   props.nextAgent.cancelChat();
 };
 // 处理上传文件事件
-const handleUploadFiles = (files: File[]) => {
+const handleUploadFiles = (_files: File[]) => {
   // TODO: 处理上传文件事件
+  files = _files;
 };
 
 // ********************* 生命周期 ***********************

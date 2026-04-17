@@ -3,7 +3,10 @@ import { TinyRemoter } from "next-remoter";
 import { NextAgent } from "next-agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 
-const deepseek = createDeepSeek({
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+
+const deepseek = createOpenAICompatible({
+  name: "lmstudio",
   apiKey: "sk-b462f8de7b364629b3136312c106655a",
   // baseURL: "https://api.deepseek.com",
   baseURL: "http://localhost:1234/v1",
