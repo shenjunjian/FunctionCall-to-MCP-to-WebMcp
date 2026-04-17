@@ -38,8 +38,10 @@
     "@mcp-b/webmcp-types": "^2.2.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@opentiny/next": "^0.3.2",
+    "@page-agent/page-controller": "^1.8.0",
     "ai": "^6.0.168",
     "json-schema-to-zod": "2.8.1",
+    "zod-to-json-schema": "^3.25.2",
     "vue": "^3.5.0",
     "zod": "^3.25.76"
   },

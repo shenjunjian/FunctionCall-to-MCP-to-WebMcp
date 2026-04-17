@@ -28,6 +28,7 @@ setTimeout(() => {
   //   name: "xxxx 系统",
   // });
   // agent.$mcpServers.addMcpServer({ type: "iframe", name: "xxxx 系统" });
+  agent.$mcpServers.addMcpServer({ type: "page", name: "xxxx 系统" });
 }, 2000);
 
 // _agent.chatStream({

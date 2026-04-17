@@ -1,4 +1,14 @@
-export { NextAgent } from "./next-agent.ts";
+// *********** user 开发 ***********
+export { registerPageAgentTool } from "./tools/page-agent-tool/page-agent-tool.ts";
 export { registerOnPage, type RegisterOnPageOption } from "./user/index.ts";
 
-export type { PageServer, IframeServer, StreamableHttpServer, SSEServer, NextMcpServer } from "./servers/servers.d.ts";
+// *********** remoter 开发 ***********
+export { NextAgent } from "./next-agent.ts";
+
+export type {
+  PageServer,
+  IframeServer,
+  StreamableHttpServer,
+  SSEServer,
+  NextMcpServer,
+} from "./servers/servers.d.ts";
