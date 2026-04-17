@@ -105,6 +105,7 @@ import { bubbleStoreKey, pillItems, type PillItem, type PillItemMenu } from "./u
 import WelcomeLogo from "./components/welcome-logo.vue";
 import SchemaCard from "./components/schema-card.ce.vue";
 import StartContentRenderer from "./components/start-content-renderer.vue";
+import UserModelContentRenderer from "./components/user-model-content-renderer.vue";
 
 // 尺寸，定位等，参考  https://opentiny.github.io/tiny-robot/latest/components/container.html#css-变量
 // 也可以直接绑定 style, 直接透传到 TrContainer 组件上。
@@ -203,9 +204,12 @@ const contentRendererMatches: BubbleContentRendererMatch[] = [
     renderer: markRaw(StartContentRenderer) as any,
     priority: BubbleRendererMatchPriority.NORMAL,
   },
+  {
+    find: (message) => message.role === "user",
+    renderer: markRaw(UserModelContentRenderer) as any,
+    priority: BubbleRendererMatchPriority.NORMAL,
+  },
 ]
-
-
 // ****************** 方法 ***********************
 const handlePillItemClick = (menu: PillItemMenu) => {
   inputMessage.value = menu.inputMessage;
@@ -249,7 +253,6 @@ const cancelRequest = () => {
 };
 // 处理上传文件事件
 const handleUploadFiles = (_files: File[]) => {
-  // TODO: 处理上传文件事件
   files = _files;
 };
 
