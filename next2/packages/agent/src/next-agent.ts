@@ -2,6 +2,7 @@ import {
   ToolLoopAgent,
   type ModelMessage,
   type ToolLoopAgentSettings,
+  type ToolSet,
   type UserModelMessage,
 } from "ai";
 import type { StartContent } from "./streamVisitor";
@@ -57,6 +58,8 @@ export class NextAgent {
   $conversation = useConversation(this);
   $promptManager = usePromptManager(this);
   $mcpServers = useMcpServers(this);
+  // 不用添加到 $mcpServers中，就能加载的tools
+  extraTools: ToolSet = {};
   status: Ref<NextAgentStatus> = useStatus(this);
 
   /** 初始化智能体， 设置大语言模型

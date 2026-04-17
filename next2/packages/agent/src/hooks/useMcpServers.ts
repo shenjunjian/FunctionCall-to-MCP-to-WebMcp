@@ -57,14 +57,14 @@ export function useMcpServers(agent: NextAgent) {
     }
   }
 
-  // 每次对话前，重新刷新所有工具
+  // 每次对话前，刷新工具。 tools三个来源： settings.tools, extraTools, mcpServers.tools， 一个删除。
   agent.on("chatStart", async () => {
     // 清空工具
     Object.keys(tools).forEach((key) => {
       delete tools[key];
     });
     // 合并初始工具
-    Object.assign(tools, agent.settings.tools || {});
+    Object.assign(tools, agent.settings.tools || {}, agent.extraTools);
     // 合并 mcpServers 中的工具
     for (const server of mcpServers.value) {
       await getToolsFromServer(server);
