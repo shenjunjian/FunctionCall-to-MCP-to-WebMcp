@@ -2,9 +2,11 @@
 import { TinyRemoter } from "next-remoter";
 import { NextAgent } from "next-agent";
 import { createDeepSeek } from "@ai-sdk/deepseek";
+import { registerPageAgentTool } from "next-agent";
 
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
+// ********************** local llm **********************
 const deepseek = createOpenAICompatible({
   name: "lmstudio",
   apiKey: "sk-b462f8de7b364629b3136312c106655a",
@@ -17,9 +19,36 @@ const agent = new NextAgent({
   // model: deepseek("deepseek-chat"),
 });
 
+// ********************** deepseek llm **********************
+// const deepseek = createDeepSeek({
+//   apiKey: "sk-b462f8de7b364629b3136312c106655a",
+//   baseURL: "https://api.deepseek.com",
+// });
+
+// const agent = new NextAgent({
+//   model: deepseek("deepseek-chat"),
+// });
+
 console.log("iframe 页面agent", agent);
 
 window._agent = agent;
+registerPageAgentTool();
+
+navigator.modelContext.registerTool({
+  name: "get-color",
+  description: "获取当前颜色",
+  inputSchema: { type: "object", properties: {} },
+  async execute() {
+    return {
+      content: [
+        {
+          type: "text",
+          text: `当前红色, from buildin-modelcontext`,
+        },
+      ],
+    };
+  },
+});
 
 setTimeout(() => {
   // agent.$mcpServers.addMcpServer({

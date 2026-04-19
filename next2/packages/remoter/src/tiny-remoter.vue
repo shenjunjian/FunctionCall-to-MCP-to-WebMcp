@@ -106,6 +106,7 @@ import WelcomeLogo from "./components/welcome-logo.vue";
 import SchemaCard from "./components/schema-card.ce.vue";
 import StartContentRenderer from "./components/start-content-renderer.vue";
 import UserModelContentRenderer from "./components/user-model-content-renderer.vue";
+import { filesToBase64 } from "./utils/fileHelper";
 
 // 尺寸，定位等，参考  https://opentiny.github.io/tiny-robot/latest/components/container.html#css-变量
 // 也可以直接绑定 style, 直接透传到 TrContainer 组件上。
@@ -183,6 +184,8 @@ const { isTouchDevice } = useTouchDevice();
 const showHistory = ref(false);
 const inputMessage = ref("");
 
+
+
 const loading = computed(() => props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming")
 /** 本次对话前，用户选择的文件 */
 let files: File[] = []
@@ -219,23 +222,23 @@ const handleSendMessage = async (
   structuredData?: StructuredData | undefined,
 ) => {
   let message: UserModelMessage
-  // 1个文件，则判断图片后决定用 ImagePart。  
+  // 1个文件，则判断图片后决定用 ImagePart。   【备注】 ai-sdk支持url, buffer, base64 格式. 但参考 qwen 文档，只支持 url, base64 格式. 所以此处取 base64 格式.
   if (files.length === 1 && files[0].type.startsWith("image/")) {
     message = {
       role: "user", content: [
         { type: "text", text: textContent },
-        { type: "image", image: await files[0].arrayBuffer(), mediaType: files[0].type } as ImagePart
+        { type: "image", image: await filesToBase64(files[0]), mediaType: files[0].type } as ImagePart
       ]
     }
   }
   else {
     // 多个文件，直接用 FilePart。
     if (files.length > 0) {
-      const fileBuffers = await Promise.all(files.map((file) => file.arrayBuffer()));
+      const fileBase64 = await Promise.all(files.map((file) => filesToBase64(file)));
       message = {
         role: "user", content: [
           { type: "text", text: textContent },
-          ...fileBuffers.map((file, index) => ({ type: "file", data: file, mediaType: files[index].type } as FilePart))
+          ...fileBase64.map((base64, index) => ({ type: "file", data: base64, size: files[index].size, filename: files[index].name, mediaType: files[index].type } as FilePart))
         ]
       }
     } else {
