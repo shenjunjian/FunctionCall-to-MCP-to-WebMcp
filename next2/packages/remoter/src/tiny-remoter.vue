@@ -58,13 +58,12 @@
             :loading="loading" showWordLimit :maxLength="20000" :clearable="true" @submit="handleSendMessage"
             @cancel="cancelRequest">
             <template #header v-if="files.length > 0">
-              <TrAttachments :actions="[]"
-                :items="files.map(f => ({ rawFile: f, url: fileCacheToURL(f), status: 'success' }))"
-                @remove="removeFile">
+              <TrAttachments :actions="[]" @remove="removeFile"
+                :items="files.map(f => ({ rawFile: f, url: fileCacheToURL(f), status: 'success' }))">
               </TrAttachments>
             </template>
             <template #footer-right>
-              <!-- 上传按钮1 -->
+              <!-- 上传按钮 -->
               <UploadButton v-if="uploadButtonConfig" v-bind="uploadButtonConfig" @select="handleUploadFiles" />
               <!-- 语音输入按钮. 暂时用“混合输入”， 因为测试“连续输入”有bug   -->
               <VoiceButton v-if="voiceButtonConfig" v-bind="voiceButtonConfig" />
@@ -96,6 +95,7 @@ import {
   type BubbleListProps,
   type BubbleContentRendererMatch,
   BubbleRendererMatchPriority,
+  type Attachment,
 } from "@opentiny/tiny-robot";
 import {
   IconNewSession,
@@ -272,8 +272,9 @@ const handleUploadFiles = (_files: File[]) => {
   files.value = _files;
 };
 // 处理删除文件事件
-const removeFile = (file: File) => {
-  files.value = files.value.filter(f => f !== file);
+const removeFile = (file: Attachment) => {
+
+  files.value = files.value.filter(f => f !== file.rawFile);
 }
 
 // ********************* 生命周期 ***********************
