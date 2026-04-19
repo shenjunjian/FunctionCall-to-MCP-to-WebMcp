@@ -57,8 +57,14 @@
             :class="{ 'tr-sender-compact': !fullscreen }" :placeholder="loading ? '正在思考中...' : '请输入您的问题'"
             :loading="loading" showWordLimit :maxLength="20000" :clearable="true" @submit="handleSendMessage"
             @cancel="cancelRequest">
+            <template #header v-if="files.length > 0">
+              <TrAttachments :actions="[]"
+                :items="files.map(f => ({ rawFile: f, url: fileCacheToURL(f), status: 'success' }))"
+                @remove="removeFile">
+              </TrAttachments>
+            </template>
             <template #footer-right>
-              <!-- 上传按钮 -->
+              <!-- 上传按钮1 -->
               <UploadButton v-if="uploadButtonConfig" v-bind="uploadButtonConfig" @select="handleUploadFiles" />
               <!-- 语音输入按钮. 暂时用“混合输入”， 因为测试“连续输入”有bug   -->
               <VoiceButton v-if="voiceButtonConfig" v-bind="voiceButtonConfig" />
@@ -83,6 +89,7 @@ import {
   TrWelcome,
   TrBubbleList,
   TrBubbleProvider,
+  TrAttachments,
   type StructuredData,
   type VoiceButtonProps,
   type UploadButtonProps,
@@ -100,7 +107,7 @@ import {
 import { vOnClickOutside } from "@vueuse/components";
 import { NextAgent } from "next-agent";
 import { type FilePart, type ImagePart, type UserModelMessage } from "ai";
-import { computed, defineCustomElement, h, markRaw, onMounted, provide, reactive, ref, type PropType } from "vue";
+import { computed, defineCustomElement, h, markRaw, onMounted, onUnmounted, provide, reactive, ref, shallowRef, type PropType, type Ref } from "vue";
 import { bubbleStoreKey, pillItems, type PillItem, type PillItemMenu } from "./utils/const";
 import WelcomeLogo from "./components/welcome-logo.vue";
 import SchemaCard from "./components/schema-card.ce.vue";
@@ -188,7 +195,13 @@ const inputMessage = ref("");
 
 const loading = computed(() => props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming")
 /** 本次对话前，用户选择的文件 */
-let files: File[] = []
+let files: Ref<File[]> = shallowRef([])
+let fileUrls: string[] = []
+const fileCacheToURL = (file: File) => {
+  const url = URL.createObjectURL(file);
+  fileUrls.push(url);
+  return url;
+}
 
 const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
 
@@ -223,22 +236,22 @@ const handleSendMessage = async (
 ) => {
   let message: UserModelMessage
   // 1个文件，则判断图片后决定用 ImagePart。   【备注】 ai-sdk支持url, buffer, base64 格式. 但参考 qwen 文档，只支持 url, base64 格式. 所以此处取 base64 格式.
-  if (files.length === 1 && files[0].type.startsWith("image/")) {
+  if (files.value.length === 1 && files.value[0].type.startsWith("image/")) {
     message = {
       role: "user", content: [
         { type: "text", text: textContent },
-        { type: "image", image: await filesToBase64(files[0]), mediaType: files[0].type } as ImagePart
+        { type: "image", image: await filesToBase64(files.value[0]), mediaType: files.value[0].type } as ImagePart
       ]
     }
   }
   else {
     // 多个文件，直接用 FilePart。
-    if (files.length > 0) {
-      const fileBase64 = await Promise.all(files.map((file) => filesToBase64(file)));
+    if (files.value.length > 0) {
+      const fileBase64 = await Promise.all(files.value.map((file) => filesToBase64(file)));
       message = {
         role: "user", content: [
           { type: "text", text: textContent },
-          ...fileBase64.map((base64, index) => ({ type: "file", data: base64, size: files[index].size, filename: files[index].name, mediaType: files[index].type } as FilePart))
+          ...fileBase64.map((base64, index) => ({ type: "file", data: base64, size: files.value[index].size, filename: files.value[index].name, mediaType: files.value[index].type } as FilePart))
         ]
       }
     } else {
@@ -249,15 +262,19 @@ const handleSendMessage = async (
 
   props.nextAgent.chatStream(message);
   inputMessage.value = "";
-  files = [];
+  files.value = [];
 };
 const cancelRequest = () => {
   props.nextAgent.cancelChat();
 };
 // 处理上传文件事件
 const handleUploadFiles = (_files: File[]) => {
-  files = _files;
+  files.value = _files;
 };
+// 处理删除文件事件
+const removeFile = (file: File) => {
+  files.value = files.value.filter(f => f !== file);
+}
 
 // ********************* 生命周期 ***********************
 onMounted(() => {
@@ -266,6 +283,12 @@ onMounted(() => {
     const CardElement = defineCustomElement(SchemaCard);
     customElements.define("schema-card", CardElement);
   }
+});
+
+onUnmounted(() => {
+  files.value = [];
+  fileUrls.forEach(url => URL.revokeObjectURL(url));
+  fileUrls = [];
 });
 </script>
 
