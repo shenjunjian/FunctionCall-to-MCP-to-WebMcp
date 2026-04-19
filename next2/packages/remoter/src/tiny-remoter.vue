@@ -44,7 +44,8 @@
     </template>
     <template #footer>
       <slot name="footer">
-        <div class="tiny-remoter-chat-input" :class="{ 'max-container': fullscreen }">
+        <div class="tiny-remoter-chat-input" :class="{ 'max-container': fullscreen }"
+          v-dropzone="{ ...dropzoneConfig, onDrop: handleUploadFiles, onDraggingChange: handleDraggingChange }">
           <div class="chat-input-pills">
             <tr-dropdown-menu v-for="pill in pillItems" :key="pill.id" :items="pill.menus"
               @item-click="handlePillItemClick" trigger="click">
@@ -70,6 +71,8 @@
             </template>
           </tr-sender>
         </div>
+        <!-- 浮层组件 -->
+        <tr-drag-overlay :is-dragging="isDragging" :drag-target="targetElement" v-bind="dragOverlayConfig" />
       </slot>
     </template>
   </TrContainer>
@@ -89,6 +92,8 @@ import {
   TrBubbleList,
   TrBubbleProvider,
   TrAttachments,
+  TrDragOverlay,
+  vDropzone,
   type StructuredData,
   type VoiceButtonProps,
   type UploadButtonProps,
@@ -96,6 +101,8 @@ import {
   type BubbleContentRendererMatch,
   BubbleRendererMatchPriority,
   type Attachment,
+  type DropzoneBinding,
+  type DragOverlayProps,
 } from "@opentiny/tiny-robot";
 import {
   IconNewSession,
@@ -142,6 +149,16 @@ const props = defineProps({
   uploadButtonConfig: {
     type: Object as PropType<UploadButtonProps>,
     default: () => ({}),
+  },
+  /** 拖放指令配置，设置false则隐藏按钮。 配置参考 https://opentiny.github.io/tiny-robot/latest/components/drag-overlay.html#attributes */
+  dropzoneConfig: {
+    type: Object as PropType<DropzoneBinding>,
+    default: () => ({}),
+  },
+  /** 拖放区域配置。 配置参考 https://opentiny.github.io/tiny-robot/latest/components/drag-overlay.html#props */
+  dragOverlayConfig: {
+    type: Object as PropType<DragOverlayProps>,
+    default: () => ({ overlayTitle: '将图片拖到此处完成上传' }),
   },
   /** 聊天内容区域 配置，参考 https://docs.opentiny.design/tiny-robot/components/bubble.html#props
    * 可以设置： 分组策略、角色的头像，位置，形状、 内容渲染模式、autoScroll 等
@@ -194,7 +211,7 @@ const inputMessage = ref("");
 
 
 const loading = computed(() => props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming")
-/** 本次对话前，用户选择的文件 */
+// *********************** 选择文件 & 拖放区域 ***********************
 let files: Ref<File[]> = shallowRef([])
 let fileUrls: string[] = []
 const fileCacheToURL = (file: File) => {
@@ -202,6 +219,9 @@ const fileCacheToURL = (file: File) => {
   fileUrls.push(url);
   return url;
 }
+const isDragging = ref(false)
+const targetElement = ref<HTMLElement | null>(null)
+// *********************** end ***********************
 
 const welcomeIcon = h(WelcomeLogo, { style: { width: "48px", height: "48px" } });
 
@@ -267,16 +287,20 @@ const handleSendMessage = async (
 const cancelRequest = () => {
   props.nextAgent.cancelChat();
 };
-// 处理上传文件事件
+// 处理上传文件事件， 与拖放指令释放事件
 const handleUploadFiles = (_files: File[]) => {
-  files.value = _files;
+  files.value = [...files.value, ..._files];
 };
 // 处理删除文件事件
 const removeFile = (file: Attachment) => {
-
   files.value = files.value.filter(f => f !== file.rawFile);
 }
-
+// 处理拖放指令事件
+function handleDraggingChange(dragging: boolean, element: HTMLElement | null) {
+  isDragging.value = dragging
+  targetElement.value = element
+  console.log("handleDraggingChange", dragging, element);
+}
 // ********************* 生命周期 ***********************
 onMounted(() => {
   // 注册自定义元素
@@ -294,6 +318,10 @@ onUnmounted(() => {
 </script>
 
 <style>
+.tiny-remoter-wrap {
+  --tr-drag-overlay-content-padding: 0;
+}
+
 /** 历史对话弹窗 */
 .tr-history-custom-container {
   position: absolute;
