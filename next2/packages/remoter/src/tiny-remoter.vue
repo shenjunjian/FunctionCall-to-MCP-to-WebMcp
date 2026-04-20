@@ -45,7 +45,7 @@
     <template #footer>
       <slot name="footer">
         <div class="tiny-remoter-chat-input" :class="{ 'max-container': fullscreen }"
-          v-dropzone="{ ...dropzoneConfig, onDrop: handleUploadFiles, onDraggingChange: handleDraggingChange }">
+          v-dropzone="{ ...dropzoneConfig, onDrop: handleUploadFiles, onDraggingChange: handleDraggingChange, onError: handleError }">
           <div class="chat-input-pills">
             <tr-dropdown-menu v-for="pill in pillItems" :key="pill.id" :items="pill.menus"
               @item-click="handlePillItemClick" trigger="click">
@@ -76,11 +76,13 @@
       </slot>
     </template>
   </TrContainer>
+
+  <Toast v-model:messages="toastMessages" />
 </template>
 <script setup lang="ts">
 import { TrContainer, TrIconButton, TrHistory, useTouchDevice, TrSender, TrSuggestionPillButton, TrDropdownMenu, UploadButton, VoiceButton, TrWelcome } from "@opentiny/tiny-robot";
 import { TrBubbleList, TrBubbleProvider, TrAttachments, TrDragOverlay, vDropzone, BubbleRendererMatchPriority } from "@opentiny/tiny-robot";
-import type { StructuredData, VoiceButtonProps, UploadButtonProps, BubbleListProps, BubbleContentRendererMatch, Attachment, DropzoneBinding, DragOverlayProps } from "@opentiny/tiny-robot";
+import type { StructuredData, VoiceButtonProps, UploadButtonProps, BubbleListProps, BubbleContentRendererMatch, Attachment, DropzoneBinding, DragOverlayProps, FileRejection } from "@opentiny/tiny-robot";
 import { IconNewSession, IconHistory, IconClose, IconAi, IconUser } from "@opentiny/tiny-robot-svgs";
 import { vOnClickOutside } from "@vueuse/components";
 import { NextAgent } from "next-agent";
@@ -89,6 +91,7 @@ import { computed, defineCustomElement, h, markRaw, onMounted, onUnmounted, prov
 import { bubbleStoreKey, pillItems, type PillItem, type PillItemMenu } from "./utils/const";
 import WelcomeLogo from "./components/welcome-logo.vue";
 import SchemaCard from "./components/schema-card.ce.vue";
+import Toast from "./components/toast.vue";
 import StartContentRenderer from "./components/start-content-renderer.vue";
 import UserModelContentRenderer from "./components/user-model-content-renderer.vue";
 import { filesToBase64 } from "./utils/fileHelper";
@@ -179,6 +182,7 @@ const { isTouchDevice } = useTouchDevice();
 const showHistory = ref(false);
 const inputMessage = ref("");
 const loading = computed(() => props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming")
+const toastMessages = ref<string[]>([]);
 // *********************** 选择文件 & 拖放区域 ***********************
 let files: Ref<File[]> = shallowRef([])
 let fileUrls: string[] = []
@@ -268,6 +272,12 @@ function handleDraggingChange(dragging: boolean, element: HTMLElement | null) {
   isDragging.value = dragging
   targetElement.value = element
   console.log("handleDraggingChange", dragging, element);
+}
+// 处理拖放指令错误事件
+function handleError(rejection: FileRejection) {
+  // todo: 缺少toast提示用户
+  console.log("handleError", rejection);
+  toastMessages.value.push(rejection.message);
 }
 // ********************* 生命周期 ***********************
 onMounted(() => {
