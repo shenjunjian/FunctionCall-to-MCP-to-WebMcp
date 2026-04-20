@@ -15,7 +15,7 @@ import { watch, onUnmounted } from 'vue';
 const props = defineProps({
     messages: {
         type: Array,
-        default: () => globalMessages,
+        default: () => [],
     },
     duration: {
         type: Number,
