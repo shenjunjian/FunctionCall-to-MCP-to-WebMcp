@@ -78,39 +78,10 @@
   </TrContainer>
 </template>
 <script setup lang="ts">
-import {
-  TrContainer,
-  TrIconButton,
-  TrHistory,
-  useTouchDevice,
-  TrSender,
-  TrSuggestionPillButton,
-  TrDropdownMenu,
-  UploadButton,
-  VoiceButton,
-  TrWelcome,
-  TrBubbleList,
-  TrBubbleProvider,
-  TrAttachments,
-  TrDragOverlay,
-  vDropzone,
-  type StructuredData,
-  type VoiceButtonProps,
-  type UploadButtonProps,
-  type BubbleListProps,
-  type BubbleContentRendererMatch,
-  BubbleRendererMatchPriority,
-  type Attachment,
-  type DropzoneBinding,
-  type DragOverlayProps,
-} from "@opentiny/tiny-robot";
-import {
-  IconNewSession,
-  IconHistory,
-  IconClose,
-  IconAi,
-  IconUser,
-} from "@opentiny/tiny-robot-svgs";
+import { TrContainer, TrIconButton, TrHistory, useTouchDevice, TrSender, TrSuggestionPillButton, TrDropdownMenu, UploadButton, VoiceButton, TrWelcome } from "@opentiny/tiny-robot";
+import { TrBubbleList, TrBubbleProvider, TrAttachments, TrDragOverlay, vDropzone, BubbleRendererMatchPriority } from "@opentiny/tiny-robot";
+import type { StructuredData, VoiceButtonProps, UploadButtonProps, BubbleListProps, BubbleContentRendererMatch, Attachment, DropzoneBinding, DragOverlayProps } from "@opentiny/tiny-robot";
+import { IconNewSession, IconHistory, IconClose, IconAi, IconUser } from "@opentiny/tiny-robot-svgs";
 import { vOnClickOutside } from "@vueuse/components";
 import { NextAgent } from "next-agent";
 import { type FilePart, type ImagePart, type UserModelMessage } from "ai";
@@ -207,9 +178,6 @@ const show = defineModel("show", { type: Boolean, default: false });
 const { isTouchDevice } = useTouchDevice();
 const showHistory = ref(false);
 const inputMessage = ref("");
-
-
-
 const loading = computed(() => props.nextAgent.status.value === "processing" || props.nextAgent.status.value === "streaming")
 // *********************** 选择文件 & 拖放区域 ***********************
 let files: Ref<File[]> = shallowRef([])
